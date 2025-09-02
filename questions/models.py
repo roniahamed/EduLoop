@@ -44,7 +44,7 @@ class Question(models.Model):
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
 
     # Question-specific data inside metadata
-    metadata = JSONField(default=dict, blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
