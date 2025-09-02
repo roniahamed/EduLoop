@@ -9,16 +9,34 @@ class Subject(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('group', 'name')
+        ordering = ['group', 'name']
+        verbose_name = 'Subject'
+        verbose_name_plural = 'Subjects'
 
 class Category(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ('subject', 'name')
+        ordering = ['subject', 'name']
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
+
 class SubCategory(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('category', 'name')
+        ordering = ['category', 'name']
+        verbose_name = 'SubCategory'
+        verbose_name_plural = 'SubCategories'
 
 class Question(models.Model):
     LEVEL_CHOICES = [
