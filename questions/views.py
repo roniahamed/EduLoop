@@ -40,7 +40,17 @@ class CategoryViewSet(ListAPIView):
     def get_queryset(self):
         subject_id = self.kwargs.get('subject_id')
         subject = get_object_or_404(Subject, id=subject_id)
-        return Category.objects.select_related('subject').filter(subject=subject).order_by('-created_at')
+        return Category.objects.select_related('subject__group').filter(subject=subject).order_by('-created_at')
+    
+class SubCategoryViewSet(ListAPIView):
+    serializer_class = SubCategorySerializer
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        category_id = self.kwargs.get('category_id')
+        category = get_object_or_404(Category, id=category_id)
+        return SubCategory.objects.select_related('category__subject__group').filter(category=category).order_by('-created_at')
+
     
 
 
