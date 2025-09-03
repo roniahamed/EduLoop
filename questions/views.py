@@ -23,10 +23,6 @@ class GroupViewSet(ListAPIView):
     # permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = StandardResultsSetPagination
 
-
-
-
-
 class SubjectViewSet(ListAPIView):
     # queryset = Subject.objects.select_related('group').all().order_by('-created_at')
     serializer_class = SubjectSerializer
@@ -37,5 +33,15 @@ class SubjectViewSet(ListAPIView):
         group = get_object_or_404(Group, id=group_id)
         return Subject.objects.select_related('group').filter(group=group).order_by('-created_at')
     
+class CategoryViewSet(ListAPIView):
+    serializer_class = CategorySerializer
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        subject_id = self.kwargs.get('subject_id')
+        subject = get_object_or_404(Subject, id=subject_id)
+        return Category.objects.select_related('subject').filter(subject=subject).order_by('-created_at')
+    
+
 
 

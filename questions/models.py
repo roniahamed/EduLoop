@@ -6,6 +6,9 @@ class Group(models.Model):
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.name
+
 class Subject(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='subjects')
     name = models.CharField(max_length=100)
@@ -17,6 +20,9 @@ class Subject(models.Model):
         verbose_name = 'Subject'
         verbose_name_plural = 'Subjects'
 
+    def __str__(self):
+        return self.name
+
 class Category(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='categories')
     name = models.CharField(max_length=100)
@@ -27,6 +33,8 @@ class Category(models.Model):
         ordering = ['subject', 'name']
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
+    def __str__(self):
+        return self.name
 
 class SubCategory(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
@@ -38,6 +46,8 @@ class SubCategory(models.Model):
         ordering = ['category', 'name']
         verbose_name = 'SubCategory'
         verbose_name_plural = 'SubCategories'
+    def __str__(self):
+        return self.name
 
 class Question(models.Model):
     LEVEL_CHOICES = [
@@ -67,3 +77,6 @@ class Question(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Question {self.id} - {self.type} - {self.level}"

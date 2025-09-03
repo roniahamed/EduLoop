@@ -18,6 +18,7 @@ class SubjectSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    subject = serializers.SlugRelatedField(slug_field='name', queryset=Subject.objects.all())
     class Meta:
         model = Category
         fields = ['id', 'name', 'subject', 'created_at']
