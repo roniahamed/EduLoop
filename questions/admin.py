@@ -4,7 +4,7 @@ from .models import Group, Subject, Category, SubCategory, Question
 
 @admin.register(Group)
 class GroupAdmin(ModelAdmin):
-    list_display = ('id', 'name', 'created_at')
+    list_display = ('id', 'name','description' ,'created_at')
     search_fields = ('name',)
     ordering = ('-created_at',)
 

@@ -10,6 +10,7 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'created_at']
 
 class SubjectSerializer(serializers.ModelSerializer):
+    group = serializers.SlugRelatedField(slug_field='name', queryset=Group.objects.all())
     class Meta:
         model = Subject
         fields = ['id', 'name', 'group', 'created_at']
