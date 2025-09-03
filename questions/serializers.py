@@ -35,16 +35,16 @@ class QuestionSerializer(serializers.ModelSerializer):
     subject = serializers.SlugRelatedField(slug_field='name', queryset=Subject.objects.all())
     category = serializers.SlugRelatedField(slug_field='name', queryset=Category.objects.all
 , allow_null=True, required=False)
-    sub_category = serializers.SlugRelatedField(slug_field='name', queryset=SubCategory.objects.all(), allow_null=True, required=False)
+    subcategory = serializers.SlugRelatedField(slug_field='name', queryset=SubCategory.objects.all(), allow_null=True, required=False)
     class Meta:
         model = Question
-        fields = ['id', 'group', 'subject', 'category', 'sub_category', 'level', 'type', 'metadata', 'created_at', 'updated_at']
+        fields = ['id', 'group', 'subject', 'category', 'subcategory', 'level', 'type', 'metadata', 'created_at', 'updated_at']
     
     def validate(self, data):
         group = data.get('group')
         subject = data.get('subject')
         category = data.get('category')
-        sub_category = data.get('sub_category')
+        subcategory = data.get('subcategory')
 
         # Validate Subject belongs to Group
         if subject.group != group:
@@ -55,7 +55,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             raise ValidationError("The selected category does not belong to the specified subject.")
 
         # Validate SubCategory belongs to Category
-        if sub_category and (not category or sub_category.category != category):
+        if subcategory and (not category or subcategory.category != category):
             raise ValidationError("The selected sub-category does not belong to the specified category.")
 
         return data
@@ -65,7 +65,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         instance.group = validated_data.get('group', instance.group)
         instance.subject = validated_data.get('subject', instance.subject)
         instance.category = validated_data.get('category', instance.category)
-        instance.sub_category = validated_data.get('sub_category', instance.sub_category)
+        instance.subcategory = validated_data.get('subcategory', instance.subcategory)
         instance.level = validated_data.get('level', instance.level)
         instance.type = validated_data.get('type', instance.type)
         instance.metadata = validated_data.get('metadata', instance.metadata)
@@ -76,9 +76,9 @@ class QuestionDetailSerializer(serializers.ModelSerializer):
     group = GroupSerializer(read_only=True)
     subject = SubjectSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
-    sub_category = SubCategorySerializer(read_only=True)
+    subcategory = SubCategorySerializer(read_only=True)
 
     class Meta:
         model = Question
-        fields = ['id', 'group', 'subject', 'category', 'sub_category', 'level', 'type', 'metadata', 'created_at', 'updated_at']
+        fields = ['id', 'group', 'subject', 'category', 'subcategory', 'level', 'type', 'metadata', 'created_at', 'updated_at']
 

@@ -29,7 +29,7 @@ class SubCategoryAdmin(ModelAdmin):
 
 @admin.register(Question)
 class QuestionAdmin(ModelAdmin):
-    list_display = ('id', 'type', 'level', 'group', 'subject', 'category', 'sub_category', 'created_at', 'updated_at')
-    search_fields = ('type', 'level', 'group__name', 'subject__name', 'category__name', 'sub_category__name')
-    list_filter = ('type', 'level', 'group', 'subject', 'category', 'sub_category')
+    list_display = ('id', 'type', 'level', 'group', 'subject', 'category', 'subcategory', 'created_at', 'updated_at')
+    search_fields = ('type', 'level', 'group__name', 'subject__name', 'category__name', 'subcategory__name')
+    list_filter = ('type', 'level', 'group', 'subject', 'category', 'subcategory')
     ordering = ('-created_at',)
