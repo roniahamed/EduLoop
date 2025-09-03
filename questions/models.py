@@ -6,7 +6,7 @@ class Group(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Subject(models.Model):
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='subjects')
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -17,7 +17,7 @@ class Subject(models.Model):
         verbose_name_plural = 'Subjects'
 
 class Category(models.Model):
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='categories')
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -28,7 +28,7 @@ class Category(models.Model):
         verbose_name_plural = 'Categories'
 
 class SubCategory(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -53,10 +53,10 @@ class Question(models.Model):
     ]
 
     # Main relational fields
-    group = models.ForeignKey("Group", on_delete=models.CASCADE)
-    subject = models.ForeignKey("Subject", on_delete=models.CASCADE)
-    category = models.ForeignKey("Category", on_delete=models.CASCADE, null=True, blank=True)
-    sub_category = models.ForeignKey("SubCategory", on_delete=models.CASCADE, null=True, blank=True)
+    group = models.ForeignKey("Group", on_delete=models.CASCADE, related_name='questions')
+    subject = models.ForeignKey("Subject", on_delete=models.CASCADE, related_name='questions')
+    category = models.ForeignKey("Category", on_delete=models.CASCADE, null=True, blank=True, related_name='questions')
+    sub_category = models.ForeignKey("SubCategory", on_delete=models.CASCADE, null=True, blank=True, related_name='questions')
     
     level = models.CharField(max_length=20, choices=LEVEL_CHOICES)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
