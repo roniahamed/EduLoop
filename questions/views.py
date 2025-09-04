@@ -65,7 +65,8 @@ class CategoryViewSet(ListCreateAPIView):
     pagination_class = StandardResultsSetPagination
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data = request.data, many = isinstance(request.data, list))
+        is_many = isinstance(request.data, list)
+        serializer = self.get_serializer(data = request.data, many = is_many)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)

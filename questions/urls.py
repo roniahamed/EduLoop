@@ -9,8 +9,9 @@ urlpatterns = [
     path('subjects/', SubjectViewSet.as_view(), name='subject-list'),
 
         # category views
-    path('categories/', CategoryViewSet.as_view(), name='category-list'),
-    path('category/<int:subject_id>/', CategoryDetailsViewSet.as_view(), name='category-detail-view'),
+    path('categories/', CategoryViewSet.as_view(), name='category-list-all'),
+
+    path('categories/<int:subject_id>/', CategoryDetailsViewSet.as_view(), name='category-detail-view'),
 
     # subcategory views
     path('subcategories/', SubCategoryViewSet.as_view(), name='subcategory-list-all'),
