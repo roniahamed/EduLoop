@@ -17,13 +17,13 @@ class SubjectAdmin(ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
-    list_display = ('id', 'name', 'subject', 'created_at')
+    list_display = ('id', 'name', 'subject','group','created_at')
     search_fields = ('name', 'subject__name')
     ordering = ('-created_at',)
 
 @admin.register(SubCategory)
 class SubCategoryAdmin(ModelAdmin):
-    list_display = ('id', 'name', 'category', 'created_at')
+    list_display = ('id', 'name', 'category','subject','group', 'created_at')
     search_fields = ('name', 'category__name')
     ordering = ('-created_at',)
 
