@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
+from django.db.models import F
+from django.core.exceptions import ValidationError
 
 class Group(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -25,10 +27,10 @@ class Subject(models.Model):
         return self.name
 
 class Category(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='categories')
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='categories')
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
-
     class Meta:
         ordering = ['subject', 'name']
         verbose_name = 'Category'
@@ -37,6 +39,8 @@ class Category(models.Model):
         return self.name
 
 class SubCategory(models.Model):
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='subcategories')
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='subcategories')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
