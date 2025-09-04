@@ -39,6 +39,16 @@ class SubjectSerializer(serializers.ModelSerializer):
         
 
 # Category Serializer
+
+class CategoryReadSerializer(serializers.ModelSerializer):
+    subject = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    group = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'subject','group', 'created_at']
+
+
+
 class CategorySerializer(serializers.ModelSerializer):
     subject = serializers.SlugRelatedField(slug_field='name', queryset=Subject.objects.all())
     group = serializers.SlugRelatedField(slug_field='name', queryset=Group.objects.all())
