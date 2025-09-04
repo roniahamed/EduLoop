@@ -12,6 +12,7 @@ class Group(models.Model):
 class Subject(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='subjects')
     name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:

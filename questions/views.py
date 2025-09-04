@@ -152,7 +152,7 @@ class BulkQuestionUploadView(APIView):
         questions_to_create = []
 
         for question_item in validated_data:
-            question_item.append(Question(**question_item))
+            questions_to_create.append(Question(**question_item))
 
         try: 
             created_questions = Question.objects.bulk_create(questions_to_create, batch_size=500)

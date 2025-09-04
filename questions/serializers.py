@@ -33,7 +33,7 @@ class SubCategorySerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     group = serializers.SlugRelatedField(slug_field='name', queryset=Group.objects.all())
     subject = serializers.SlugRelatedField(slug_field='name', queryset=Subject.objects.all())
-    category = serializers.SlugRelatedField(slug_field='name', queryset=Category.objects.all
+    category = serializers.SlugRelatedField(slug_field='name', queryset=Category.objects.all()
 , allow_null=True, required=False)
     subcategory = serializers.SlugRelatedField(slug_field='name', queryset=SubCategory.objects.all(), allow_null=True, required=False)
     class Meta:
