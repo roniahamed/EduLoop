@@ -7,13 +7,13 @@ from django.db.models import Q
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ['id', 'name', 'created_at']
+        fields = ['id', 'name','description', 'created_at']
 
 class SubjectSerializer(serializers.ModelSerializer):
     group = serializers.SlugRelatedField(slug_field='name', queryset=Group.objects.all())
     class Meta:
         model = Subject
-        fields = ['id', 'name', 'group', 'created_at']
+        fields = ['id', 'name','description', 'group', 'created_at']
         
 
 

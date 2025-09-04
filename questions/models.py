@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.postgres.fields import JSONField
 
 class Group(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -30,7 +30,6 @@ class Category(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('subject', 'name')
         ordering = ['subject', 'name']
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
@@ -43,7 +42,6 @@ class SubCategory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('category', 'name')
         ordering = ['category', 'name']
         verbose_name = 'SubCategory'
         verbose_name_plural = 'SubCategories'

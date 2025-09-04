@@ -11,7 +11,7 @@ class GroupAdmin(ModelAdmin):
 
 @admin.register(Subject)
 class SubjectAdmin(ModelAdmin):
-    list_display = ('id', 'name', 'group', 'created_at')
+    list_display = ('id', 'name','description', 'group', 'created_at')
     search_fields = ('name', 'group__name')
     ordering = ('-created_at',)
 

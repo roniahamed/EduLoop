@@ -7,10 +7,10 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly 
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.views import APIView
 import random
 class StandardResultsSetPagination(PageNumberPagination):
@@ -19,15 +19,35 @@ class StandardResultsSetPagination(PageNumberPagination):
     max_page_size = 100
 
 # Group View
-class GroupViewSet(ListAPIView):
+class GroupViewSet(ListCreateAPIView):
     queryset = Group.objects.all().order_by('-created_at')
     serializer_class = GroupSerializer
     # authentication_classes = [SessionAuthentication, BasicAuthentication]
     # permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = StandardResultsSetPagination
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data = request.data, many = isinstance(request.data, list))
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 # Subject View
-class SubjectViewSet(ListAPIView):
+
+class SubjectViewSet(ListCreateAPIView):
+    queryset = Subject.objects.select_related('group').all().order_by('-created_at')
+    serializer_class = SubjectSerializer
+    pagination_class = StandardResultsSetPagination
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data = request.data, many = isinstance(request.data, list))
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class SubjectDetailViewSet(ListCreateAPIView):
     # queryset = Subject.objects.select_related('group').all().order_by('-created_at')
     serializer_class = SubjectSerializer
     pagination_class = StandardResultsSetPagination
@@ -38,7 +58,7 @@ class SubjectViewSet(ListAPIView):
         return Subject.objects.select_related('group').filter(group=group).order_by('-created_at')
     
 # Category View
-class CategoryViewSet(ListAPIView):
+class CategoryViewSet(ListCreateAPIView):
     serializer_class = CategorySerializer
     pagination_class = StandardResultsSetPagination
 
@@ -46,9 +66,15 @@ class CategoryViewSet(ListAPIView):
         subject_id = self.kwargs.get('subject_id')
         subject = get_object_or_404(Subject, id=subject_id)
         return Category.objects.select_related('subject__group').filter(subject=subject).order_by('-created_at')
+    def create(self, request, *args, **kwargs): 
+        serializer = self.get_serializer(data = request.data, many = isinstance(request.data, list))
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 #  SubCategory 
-class SubCategoryViewSet(ListAPIView):
+class SubCategoryViewSet(ListCreateAPIView):
     serializer_class = SubCategorySerializer
     pagination_class = StandardResultsSetPagination
 
@@ -56,6 +82,13 @@ class SubCategoryViewSet(ListAPIView):
         category_id = self.kwargs.get('category_id')
         category = get_object_or_404(Category, id=category_id)
         return SubCategory.objects.select_related('category__subject__group').filter(category=category).order_by('-created_at')
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data = request.data, many = isinstance(request.data, list))
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
 
 #Question View 
