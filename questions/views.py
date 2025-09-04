@@ -60,7 +60,6 @@ class SubCategoryViewSet(ListAPIView):
 
 #Question View 
 
-
 QUIZ_BATCH_SIZE = 50
 class QuestionViewSet(APIView):
     
