@@ -32,6 +32,7 @@ class Category(models.Model):
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     class Meta:
+        unique_together = ('subject', 'name', 'group')
         ordering = ['subject', 'name']
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
@@ -46,7 +47,7 @@ class SubCategory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['category', 'name']
+        ordering = ['category', 'name', 'subject', 'group']
         verbose_name = 'SubCategory'
         verbose_name_plural = 'SubCategories'
     def __str__(self):

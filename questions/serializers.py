@@ -21,13 +21,13 @@ class CategorySerializer(serializers.ModelSerializer):
     subject = serializers.SlugRelatedField(slug_field='name', queryset=Subject.objects.all())
     class Meta:
         model = Category
-        fields = ['id', 'name', 'subject','group' 'created_at']
+    fields = ['id', 'name', 'subject','group', 'created_at']
 
 class SubCategorySerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(slug_field='name', queryset=Category.objects.all())
     class Meta:
         model = SubCategory
-        fields = ['id', 'name', 'category','subject', 'group' 'created_at']   
+        fields = ['id', 'name', 'category','subject', 'group', 'created_at']   
 
 
 class QuestionSerializer(serializers.ModelSerializer):

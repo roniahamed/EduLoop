@@ -1,14 +1,22 @@
-from .views import GroupViewSet, SubjectViewSet, CategoryViewSet, SubCategoryViewSet, QuestionViewSet, BulkQuestionUploadView, SubjectDetailViewSet, CategoryDetailsViewSet
+from .views import GroupViewSet, SubjectViewSet, CategoryViewSet, SubCategoryViewSet, QuestionViewSet, BulkQuestionUploadView, SubjectDetailViewSet, CategoryDetailsViewSet, SubCategoryDetailsViewSet
 from django.urls import path , include
 
 urlpatterns = [
     path('groups/', GroupViewSet.as_view(), name='group-list'),
+
+    # subject views
     path('subject/<int:group_id>/', SubjectDetailViewSet.as_view(), name='subject-view'),
     path('subjects/', SubjectViewSet.as_view(), name='subject-list'),
 
+        # category views
     path('categories/', CategoryViewSet.as_view(), name='category-list'),
     path('category/<int:subject_id>/', CategoryDetailsViewSet.as_view(), name='category-detail-view'),
-    path('subcategories/<int:category_id>/', SubCategoryViewSet.as_view(), name='subcategory-list'),
+
+    # subcategory views
+    path('subcategories/', SubCategoryViewSet.as_view(), name='subcategory-list-all'),
+    path('subcategories/<int:category_id>/', SubCategoryDetailsViewSet.as_view(), name='subcategory-list-by-category'),
+
+    # question views
     path('questions/', QuestionViewSet.as_view(), name='question-list'),
     path('upload-questions/', BulkQuestionUploadView.as_view(), name='question_upload'),
     
