@@ -49,23 +49,34 @@ class CategoryReadSerializer(serializers.ModelSerializer):
 
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    subject = serializers.SlugRelatedField(slug_field='name', queryset=Subject.objects.all())
+class CategoryWriteSerializer(serializers.ModelSerializer):
     group = serializers.SlugRelatedField(slug_field='name', queryset=Group.objects.all())
+    subject = serializers.CharField()
     class Meta:
         model = Category
         fields = ['id', 'name', 'subject','group', 'created_at']
+        read_only_fields = ['id', 'created_at']
 
     def validate(self, attrs):
-        subject = attrs.get('subject')
-        group = attrs.get('group')
-        name = attrs.get('name')
+        subject_name = attrs.get('subject')
+        group_instance = attrs.get('group')
+        category_name = attrs.get('name')
+
+        try:
+            subject_instance = Subject.objects.select_related('subject', 'group').get(name=subject_name, group=group_instance)
+        except Subject.DoesNotExist:
+            raise serializers.ValidationError({
+                "subject": f"Subject '{subject_name}' not found in group '{group_instance.name}'."
+            })
+        
+
         
          # Validate Category belongs to Subject
-        if Category.objects.select_related('category', 'subject').filter(subject=subject, group=group, name = name).exists():
+        if Category.objects.select_related('category', 'subject').filter(subject=subject_instance, group=group_instance, name = category_name).exists():
             raise serializers.ValidationError(
                 "Category with this subject and group already exists."
             )
+        attrs['subject'] = subject_instance
         return attrs
 
 
