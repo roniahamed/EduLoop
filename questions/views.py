@@ -139,6 +139,27 @@ class QuestionViewSet(APIView):
                 del request.session[key]
         return Response({'message': "Question session has been reset."}, status=status.HTTP_200_OK)
 
+class BulkQuestionUploadView(APIView):
+    def post(self, request, *args, **kwargs):
+        
+        serializer = QuestionSerializer(data = request.data, many = True)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        validated_data = serializer.validated_data
+
+        questions_to_create = []
+
+        for question_item in validated_data:
+            question_item.append(Question(**question_item))
+
+        try: 
+            created_questions = Question.objects.bulk_create(questions_to_create, batch_size=500)
+            return Response({"message": f"{len(created_questions)} questions have been uploaded successfully."}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"error":f"An error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
         
