@@ -58,7 +58,20 @@ class SubjectDetailViewSet(ListCreateAPIView):
         return Subject.objects.select_related('group').filter(group=group).order_by('-created_at')
     
 # Category View
+
 class CategoryViewSet(ListCreateAPIView):
+    queryset = Category.objects.select_related('subject__group').all().order_by('-created_at')
+    serializer_class = CategorySerializer
+    pagination_class = StandardResultsSetPagination
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data = request.data, many = isinstance(request.data, list))
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+class CategoryDetailsViewSet(ListCreateAPIView):
     serializer_class = CategorySerializer
     pagination_class = StandardResultsSetPagination
 
@@ -66,12 +79,6 @@ class CategoryViewSet(ListCreateAPIView):
         subject_id = self.kwargs.get('subject_id')
         subject = get_object_or_404(Subject, id=subject_id)
         return Category.objects.select_related('subject__group').filter(subject=subject).order_by('-created_at')
-    def create(self, request, *args, **kwargs): 
-        serializer = self.get_serializer(data = request.data, many = isinstance(request.data, list))
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 #  SubCategory 
 class SubCategoryViewSet(ListCreateAPIView):
