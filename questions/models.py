@@ -1,7 +1,5 @@
 from django.db import models
-from django.contrib.postgres.fields import JSONField
 from django.db.models import F
-from django.core.exceptions import ValidationError
 
 class Group(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -18,7 +16,7 @@ class Subject(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        unique_together = ('group', 'name')
+        unique_together = ('name','group')
         ordering = ['group', 'name']
         verbose_name = 'Subject'
         verbose_name_plural = 'Subjects'
@@ -32,7 +30,7 @@ class Category(models.Model):
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     class Meta:
-        unique_together = ('subject', 'name', 'group')
+        unique_together = ( 'name', 'subject','group')
         ordering = ['subject', 'name']
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
@@ -47,7 +45,8 @@ class SubCategory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['category', 'name', 'subject', 'group']
+        unique_together = ('name', 'category','subject','group')
+        ordering = [ 'name', 'category','subject', 'group']
         verbose_name = 'SubCategory'
         verbose_name_plural = 'SubCategories'
     def __str__(self):
