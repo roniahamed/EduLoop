@@ -49,7 +49,6 @@ class CategoryReadSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'name', 'subject', 'group']
 
 
-
 class CategoryWriteSerializer(serializers.ModelSerializer):
     group = serializers.SlugRelatedField(slug_field='name', queryset=Group.objects.all())
     subject = serializers.CharField()
@@ -81,10 +80,21 @@ class CategoryWriteSerializer(serializers.ModelSerializer):
         return attrs
 
 
+
 # SubCategory Serializer
-class SubCategorySerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(slug_field='name', queryset=Category.objects.all())
-    subject = serializers.SlugRelatedField(slug_field='name', queryset=Subject.objects.all())
+
+class SubCategoryReadSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    subject = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    group = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    class Meta:
+        model = SubCategory
+        fields = ['id', 'name', 'category','subject', 'group', 'created_at']
+        read_only_fields = ['id', 'created_at', 'name', 'category','subject', 'group']
+
+class SubCategoryWriteSerializer(serializers.ModelSerializer):
+    category = serializers.CharField()
+    subject = serializers.CharField()
     group = serializers.SlugRelatedField(slug_field='name', queryset=Group.objects.all())
 
     class Meta:
@@ -92,16 +102,33 @@ class SubCategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'category','subject', 'group', 'created_at']   
 
     def validate(self, attrs):
-        subject = attrs.get('subject')
-        group = attrs.get('group')
-        category = attrs.get('category')
-        name = attrs.get('name')
+        subject_name = attrs.get('subject')
+        group_instance = attrs.get('group')
+        category_name = attrs.get('category')
+        sub_category_name = attrs.get('name')
 
+        try:
+            subject_instance = Subject.objects.select_related('group').get(name=subject_name, group=group_instance)
+        except Subject.DoesNotExist:
+            raise serializers.ValidationError({
+                "subject": f"Subject '{subject_name}' not found in group '{group_instance.name}'."
+            })
+
+        try:
+            category_instance = Category.objects.select_related('subject','group').get(name=category_name, subject = subject_instance, group=group_instance)
+        except Category.DoesNotExist:
+            raise serializers.ValidationError({
+                  "category": f"Category '{category_name}' not found for the given group and subject."
+            })
+        
+        
          # Validate Category belongs to Subject
-        if SubCategory.objects.select_related('category', 'subject', 'group').filter(subject=subject, group=group, category = category, name = name).exists():
+        if SubCategory.objects.select_related('category', 'subject', 'group').filter(name = category_name,  category = category_instance, subject=subject_instance, group=group_instance).exists():
             raise serializers.ValidationError(
-                "SubCategory with this subject and group already exists."
+                "Category with this subject and group already exists."
             )
+        attrs['category'] = category_instance
+        attrs['subject'] = subject_instance
         return attrs
 
 
