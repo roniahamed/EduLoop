@@ -137,7 +137,7 @@ class QuestionWriteSerializer(serializers.ModelSerializer):
     group = serializers.SlugRelatedField(slug_field='name', queryset=Group.objects.all())
     subject = serializers.CharField()
     category = serializers.CharField()
-    subcategory = serializers.CharField(allow_null=True, required=False)
+    subcategory = serializers.CharField(allow_null=True, required=False, allow_blank=True)
     class Meta:
         model = Question
         fields = ['group', 'subject', 'category', 'subcategory', 'level', 'type', 'metadata']
