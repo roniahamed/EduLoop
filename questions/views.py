@@ -2,7 +2,7 @@ from .models import Group, Subject, Category, SubCategory, Question
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from rest_framework import viewsets
-from .serializers import GroupSerializer, SubjectSerializer, CategoryWriteSerializer,CategoryReadSerializer, SubCategoryReadSerializer, SubCategoryWriteSerializer, QuestionSerializer, QuestionDetailSerializer
+from .serializers import GroupSerializer, SubjectSerializer, CategoryWriteSerializer,CategoryReadSerializer, SubCategoryReadSerializer, SubCategoryWriteSerializer, QuestionWriteSerializer, QuestionDetailSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -196,7 +196,7 @@ class QuestionViewSet(APIView):
 class BulkQuestionUploadView(APIView):
     def post(self, request, *args, **kwargs):
         
-        serializer = QuestionSerializer(data = request.data, many = True)
+        serializer = QuestionWriteSerializer(data = request.data, many = True)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -209,7 +209,7 @@ class BulkQuestionUploadView(APIView):
             questions_to_create.append(Question(**question_item))
 
         try: 
-            created_questions = Question.objects.bulk_create(questions_to_create, batch_size=500)
+            created_questions = Question.objects.select_related('group', 'subject', 'category', 'subcategory').bulk_create(questions_to_create, batch_size=500)
             return Response({"message": f"{len(created_questions)} questions have been uploaded successfully."}, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error":f"An error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -83,3 +83,5 @@ class Question(models.Model):
 
     def __str__(self):
         return f"Question {self.id} - {self.type} - {self.level}"
+    
+

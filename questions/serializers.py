@@ -133,36 +133,51 @@ class SubCategoryWriteSerializer(serializers.ModelSerializer):
 
 
 # Question Serializer
-class QuestionSerializer(serializers.ModelSerializer):
+class QuestionWriteSerializer(serializers.ModelSerializer):
     group = serializers.SlugRelatedField(slug_field='name', queryset=Group.objects.all())
-    subject = serializers.SlugRelatedField(slug_field='name', queryset=Subject.objects.all())
-    category = serializers.SlugRelatedField(slug_field='name', queryset=Category.objects.all()
-, allow_null=True, required=False)
-    subcategory = serializers.SlugRelatedField(slug_field='name', queryset=SubCategory.objects.all(), allow_null=True, required=False)
+    subject = serializers.CharField()
+    category = serializers.CharField()
+    subcategory = serializers.CharField(allow_null=True, required=False)
     class Meta:
         model = Question
-        fields = ['id', 'group', 'subject', 'category', 'subcategory', 'level', 'type', 'metadata', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        fields = ['group', 'subject', 'category', 'subcategory', 'level', 'type', 'metadata']
     
-    def validate(self, data):
-        group = data.get('group')
-        subject = data.get('subject')
-        category = data.get('category')
-        subcategory = data.get('subcategory')
+    def validate(self, attrs):
+        group_instance = attrs.get('group')
+        subject_name = attrs.get('subject')
+        category_name = attrs.get('category')
+        subcategory_name = attrs.get('subcategory')
 
-        # Validate Subject belongs to Group
-        if subject.group != group:
-            raise ValidationError("The selected subject does not belong to the specified group.")
 
-        # Validate Category belongs to Subject
-        if category and category.subject != subject:
-            raise ValidationError("The selected category does not belong to the specified subject.")
+        try:
+            subject_instance = Subject.objects.get(group=group_instance, name=subject_name)
+        except Subject.DoesNotExist:
+            raise serializers.ValidationError({
+                "subject": f"Subject '{subject_name}' does not exist in group '{group_instance.name}'."
+            })
+        
+        try:
+            category_instance = Category.objects.get(group=group_instance, subject=subject_instance, name=category_name)
+        except Category.DoesNotExist:
+            raise serializers.ValidationError({
+                "category": f"Category '{category_name}' does not exist for the specified group and subject."
+            })
+        
+        subcategory_instance = None
 
-        # Validate SubCategory belongs to Category
-        if subcategory and (not category or subcategory.category != category):
-            raise ValidationError("The selected sub-category does not belong to the specified category.")
-
-        return data
+        if subcategory_name:
+            try:
+                subcategory_instance = SubCategory.objects.get( group=group_instance, subject=subject_instance, category=category_instance, name=subcategory_name)
+            except SubCategory.DoesNotExist:
+                raise serializers.ValidationError({
+                    "subcategory": "SubCategory not found for the given group, subject, and category."
+                })
+        
+        attrs['subject'] = subject_instance
+        attrs['category'] = category_instance
+        attrs['subcategory'] = subcategory_instance
+        return attrs
+    
     def create(self, validated_data):
         return Question.objects.create(**validated_data)
     def update(self, instance, validated_data):
@@ -186,6 +201,6 @@ class QuestionDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ['id', 'group', 'subject', 'category', 'sub_category', 'level', 'type', 'metadata', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'created_at', 'updated_at', 'group', 'subject', 'category', 'sub_category']
+        read_only_fields = fields
         
 
