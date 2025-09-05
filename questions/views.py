@@ -195,15 +195,56 @@ class BulkQuestionUploadView(APIView):
         if not request.data:
             return Response({"message": "No data provided."}, status=status.HTTP_400_BAD_REQUEST)
         
+        group_names = {item.get('group') for item in request.data if item.get('group')}
+        subject_lookups = {(item.get('group'), item.get('subject')) for item in request.data}
+        category_lookups = {(item.get('group'), item.get('subject'), item.get('category')) for item in request.data}
+        subcategory_lookups = {(item.get('group'), item.get('subject'), item.get('category'), item.get('subcategory')) for item in request.data if item.get('subcategory')}
+
+
+        groups = Group.objects.filter(name__in=group_names)
+        subjects = Subject.objects.select_related('group').filter(group__name__in={l[0] for l in subject_lookups}, name__in={l[1] for l in subject_lookups})
+        categories = Category.objects.select_related('group', 'subject').filter(group__name__in={l[0] for l in category_lookups}, subject__name__in={l[1] for l in category_lookups}, name__in={l[2] for l in category_lookups})
+        subcategories = SubCategory.objects.select_related('group', 'subject', 'category').filter(group__name__in={l[0] for l in subcategory_lookups}, subject__name__in={l[1] for l in subcategory_lookups}, category__name__in={l[2] for l in subcategory_lookups}, name__in={l[3] for l in subcategory_lookups})
+
+        groups_map = {g.name: g for g in groups}
+        subjects_map = {(s.group.name, s.name): s for s in subjects}
+        categories_map = {(c.group.name, c.subject.name, c.name): c for c in categories}
+        subcategories_map = {(sc.group.name, sc.subject.name, sc.category.name, sc.name): sc for sc in subcategories}
+        
         questions_to_create = []
         errors = []
 
         for index, item_data in enumerate(request.data):
-            serializer = QuestionWriteSerializer(data=item_data)
-            if serializer.is_valid():
-                questions_to_create.append(Question(**serializer.validated_data))
-            else:
-                errors.append({ "row": index + 2, "data": item_data,"errors": serializer.errors })
+            group_name = item_data.get('group')
+            subject_name = item_data.get('subject')
+            category_name = item_data.get('category')
+            subcategory_name = item_data.get('subcategory')
+
+            group = groups_map.get(group_name)
+            if not group:
+                errors.append({"row": index + 2, "errors": {"group": f"Group '{group_name}' not found."}})
+                continue
+            subject = subjects_map.get((group_name, subject_name))
+            if not subject:
+                errors.append({"row": index + 2, "errors": {"subject": f"Subject '{subject_name}' not found in group '{group_name}'."}})
+                continue
+            category = categories_map.get((group_name, subject_name, category_name))
+            if not category:
+                errors.append({"row": index + 2, "errors": {"category": f"Category '{category_name}' not found."}})
+                continue
+
+            subcategory = None
+            if subcategory_name:
+                subcategory = subcategories_map.get((group_name, subject_name, category_name, subcategory_name))
+                if not subcategory:
+                    errors.append({"row": index + 2, "errors": {"subcategory": f"SubCategory '{subcategory_name}' not found."}})
+                    continue
+            
+            questions_to_create.append(Question(
+                group=group, subject=subject, category=category, subcategory=subcategory,
+                level=item_data.get('level'), type=item_data.get('type'), metadata=item_data.get('metadata', {})
+            ))
+
 
         created_questions = []
 
