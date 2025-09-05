@@ -1,18 +1,12 @@
 from .models import Group, Subject, Category, SubCategory, Question
-from django.core.exceptions import ValidationError
-from django.db.models import Q
-from rest_framework import viewsets
+from rest_framework.exceptions import ValidationError
 from .serializers import GroupSerializer, SubjectSerializer, CategoryWriteSerializer,CategoryReadSerializer, SubCategoryReadSerializer, SubCategoryWriteSerializer, QuestionWriteSerializer, QuestionDetailSerializer
-from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from rest_framework.permissions import IsAuthenticatedOrReadOnly 
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.views import APIView
-import random
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
@@ -198,15 +192,14 @@ class BulkQuestionUploadView(APIView):
         
         serializer = QuestionWriteSerializer(data = request.data, many = True)
 
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+                
         validated_data = serializer.validated_data
 
-        questions_to_create = []
-
-        for question_item in validated_data:
-            questions_to_create.append(Question(**question_item))
+        questions_to_create = [Question(**item) for item in validated_data]
 
         try: 
             created_questions = Question.objects.select_related('group', 'subject', 'category', 'subcategory').bulk_create(questions_to_create, batch_size=500)
