@@ -113,9 +113,9 @@ class QuestionViewSet(APIView):
     
     def get_base_queryset(self, filters):
         group_id = filters.get('group_id')
-        subject_id = filter.get('subject_id')
-        category_ids = filter.get('category_ids', [])
-        subcategory_ids = filter.get('subcategory_ids', [])
+        subject_id = filters.get('subject_id')
+        category_ids = filters.get('category_ids', [])
+        subcategory_ids = filters.get('subcategory_ids', [])
 
         queryset = Question.objects.select_related('group', 'subject','category','subcategory').filter(group_id = group_id, subject_id = subject_id)
 
@@ -148,17 +148,17 @@ class QuestionViewSet(APIView):
         filters = request.session.get('question_filter')
 
         if not filters:
-            return Response({'errors': "There is no active question session." })
+            return Response({'errors': "There is no active question session." }, status=status.HTTP_400_BAD_REQUEST)
 
         question_batch = request.session.get('question_batch', [])
 
         if not question_batch:
 
-            seem_ids = request.session.get('seen_question_ids', [])
+            seen_ids = request.session.get('seen_question_ids', [])
 
             queryset = self.get_base_queryset(filters)
 
-            new_batch_ids = list(queryset.exclude(id__in = seem_ids).order_by('?').values_list('id', flat=True)[:QUIZ_BATCH_SIZE])
+            new_batch_ids = list(queryset.exclude(id__in = seen_ids).order_by('?').values_list('id', flat=True)[:QUIZ_BATCH_SIZE])
 
             if not new_batch_ids:
                 return Response({'errors': "No more new questions are available for your selection."}, status=status.HTTP_404_NOT_FOUND)
@@ -168,9 +168,9 @@ class QuestionViewSet(APIView):
             request.session['question_batch'] = question_batch
         question_id = question_batch.pop(0)
         request.session['question_batch'] = question_batch
-        seem_ids = request.session['seem_question_ids', []]
-        seem_ids.append(question_id)
-        request.session['seem_question_ids'] = seem_ids
+        seen_ids = request.session.get('seen_question_ids', [])
+        seen_ids.append(question_id)
+        request.session['seen_question_ids'] = seen_ids
 
         try:
             question = self.get_base_queryset(filters).get(id=question_id)
@@ -189,23 +189,43 @@ class QuestionViewSet(APIView):
 
 class BulkQuestionUploadView(APIView):
     def post(self, request, *args, **kwargs):
+
+        if not isinstance(request.data, list):
+            return Response({"error": "Expected a list of items."}, status=status.HTTP_400_BAD_REQUEST)
+        if not request.data:
+            return Response({"message": "No data provided."}, status=status.HTTP_400_BAD_REQUEST)
         
-        serializer = QuestionWriteSerializer(data = request.data, many = True)
+        questions_to_create = []
+        errors = []
 
-        try:
-            serializer.is_valid(raise_exception=True)
-        except ValidationError as e:
-            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
-                
-        validated_data = serializer.validated_data
+        for index, item_data in enumerate(request.data):
+            serializer = QuestionWriteSerializer(data=item_data)
+            if serializer.is_valid():
+                questions_to_create.append(Question(**serializer.validated_data))
+            else:
+                errors.append({ "row": index + 2, "data": item_data,"errors": serializer.errors })
 
-        questions_to_create = [Question(**item) for item in validated_data]
+        created_questions = []
 
-        try: 
-            created_questions = Question.objects.select_related('group', 'subject', 'category', 'subcategory').bulk_create(questions_to_create, batch_size=500)
-            return Response({"message": f"{len(created_questions)} questions have been uploaded successfully."}, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response({"error":f"An error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if questions_to_create:
+            try:
+                created_questions = Question.objects.bulk_create(questions_to_create)
+            except Exception as e:
+                return Response({"error": f"An error occurred during database operation: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        response_data = {
+            "message": f"Successfully uploaded {len(created_questions)} out of {len(request.data)} questions."
+        }
+        if errors:
+            response_data["failed_items"] = errors
+
+        if errors and not created_questions:
+            status_code = status.HTTP_400_BAD_REQUEST
+        elif errors and created_questions:
+            status_code = status.HTTP_207_MULTI_STATUS
+        else:
+            status_code = status.HTTP_201_CREATED
+
+        return Response(response_data, status=status_code)
 
 
 
