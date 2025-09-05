@@ -2,7 +2,7 @@ from .models import Group, Subject, Category, SubCategory, Question
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from rest_framework import viewsets
-from .serializers import GroupSerializer, SubjectSerializer, CategoryWriteSerializer,CategoryReadSerializer, SubCategorySerializer, QuestionSerializer, QuestionDetailSerializer
+from .serializers import GroupSerializer, SubjectSerializer, CategoryWriteSerializer,CategoryReadSerializer, SubCategoryReadSerializer, SubCategoryWriteSerializer, QuestionSerializer, QuestionDetailSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -88,8 +88,11 @@ class CategoryDetailsViewSet(ListAPIView):
 #  SubCategory 
 
 class SubCategoryViewSet(ListCreateAPIView):
-    serializer_class = SubCategorySerializer
     pagination_class = StandardResultsSetPagination
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return SubCategoryWriteSerializer
+        return SubCategoryReadSerializer
     def get_queryset(self):
         return SubCategory.objects.select_related('category','subject','group').all().order_by('-created_at')
     
@@ -101,7 +104,7 @@ class SubCategoryViewSet(ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class SubCategoryDetailsViewSet(ListAPIView):
-    serializer_class = SubCategorySerializer
+    serializer_class = SubCategoryReadSerializer
     pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
