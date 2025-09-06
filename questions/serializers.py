@@ -123,7 +123,7 @@ class SubCategoryWriteSerializer(serializers.ModelSerializer):
         
         
          # Validate Category belongs to Subject
-        if SubCategory.objects.select_related('category', 'subject', 'group').filter(name = category_name,  category = category_instance, subject=subject_instance, group=group_instance).exists():
+        if SubCategory.objects.select_related('category', 'subject', 'group').filter(name = sub_category_name,  category = category_instance, subject=subject_instance, group=group_instance).exists():
             raise serializers.ValidationError(
                 "Category with this subject and group already exists."
             )
