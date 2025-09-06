@@ -116,7 +116,6 @@ class SubCategoryDetailsViewSet(ListAPIView):
 
 QUIZ_BATCH_SIZE = 50
 class QuestionViewSet(APIView):
-    permission_classes = [IsAdminOrReadOnly]
     
     def get_base_queryset(self, filters):
         group_id = filters.get('group_id')
