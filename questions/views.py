@@ -123,11 +123,13 @@ class QuestionViewSet(APIView):
         category_ids = filters.get('category_ids', [])
         subcategory_ids = filters.get('subcategory_ids', [])
         levels = filters.get('levels', [])
+        # print(levels)
 
         queryset = Question.objects.select_related('group', 'subject','category','subcategory').filter(group_id = group_id, subject_id = subject_id)
 
         if levels:
             queryset = queryset.filter(level__in=levels)
+            print(levels)
 
         if subcategory_ids:
             queryset = queryset.filter(subcategory__id__in = subcategory_ids)

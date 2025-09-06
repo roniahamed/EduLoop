@@ -58,13 +58,13 @@ class Question(models.Model):
         ("medium", "Medium"),
         ("advance", "Advance")
     ]
-    TYPE_CHOICES = [
-        ("mcq", "Multiple Choice"),
-        ("fill_blank", "Fill in the Blank"),
-        ("writing", "Writing"),
-        ("math", "Math Problem"),
-        ("true_false", "True/False")
-    ]
+    # TYPE_CHOICES = [
+    #     ("mcq", "Multiple Choice"),
+    #     ("fill_blank", "Fill in the Blank"),
+    #     ("writing", "Writing"),
+    #     ("math", "Math Problem"),
+    #     ("true_false", "True/False")
+    # ]
 
     # Main relational fields
     group = models.ForeignKey("Group", on_delete=models.CASCADE, related_name='questions')
@@ -73,7 +73,7 @@ class Question(models.Model):
     subcategory = models.ForeignKey("SubCategory", on_delete=models.CASCADE, null=True, blank=True, related_name='questions')
     
     level = models.CharField(max_length=20, choices=LEVEL_CHOICES)
-    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    type = models.CharField(max_length=20)
 
     # Question-specific data inside metadata
     metadata = models.JSONField(default=dict, blank=True)
