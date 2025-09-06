@@ -1,9 +1,10 @@
 from django.contrib import admin
+from unfold.admin import ModelAdmin
 from .models import AccessToken
 
 
 @admin.register(AccessToken)
-class AccessTokenAdmin(admin.ModelAdmin):
+class AccessTokenAdmin(ModelAdmin):
     list_display = ('key', 'description', 'is_active', 'created_at')
     list_filter = ('is_active', 'created_at')
     search_fields = ('key', 'description')
