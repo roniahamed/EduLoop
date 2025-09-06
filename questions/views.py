@@ -122,8 +122,12 @@ class QuestionViewSet(APIView):
         subject_id = filters.get('subject_id')
         category_ids = filters.get('category_ids', [])
         subcategory_ids = filters.get('subcategory_ids', [])
+        levels = filters.get('levels', [])
 
         queryset = Question.objects.select_related('group', 'subject','category','subcategory').filter(group_id = group_id, subject_id = subject_id)
+
+        if levels:
+            queryset = queryset.filter(level__in=levels)
 
         if subcategory_ids:
             queryset = queryset.filter(subcategory__id__in = subcategory_ids)
@@ -138,7 +142,8 @@ class QuestionViewSet(APIView):
             'group_id' : request.data.get('group_id'),
             'subject_id' : request.data.get('subject_id'),
             'category_ids' : request.data.get('category_ids', []),
-            'subcategory_ids' : request.data.get('subcategory_ids', [])
+            'subcategory_ids' : request.data.get('subcategory_ids', []),
+            'levels': request.data.get('levels', [])
         }
 
         if not filters['group_id'] or not filters['subject_id']:
