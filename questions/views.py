@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.views import APIView
+from .permissions import IsAdminOrReadOnly
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
@@ -16,9 +17,8 @@ class StandardResultsSetPagination(PageNumberPagination):
 class GroupViewSet(ListCreateAPIView):
     queryset = Group.objects.all().order_by('-created_at')
     serializer_class = GroupSerializer
-    # authentication_classes = [SessionAuthentication, BasicAuthentication]
-    # permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = StandardResultsSetPagination
+    permission_classes = [IsAdminOrReadOnly]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data, many = isinstance(request.data, list))
@@ -33,6 +33,7 @@ class SubjectViewSet(ListCreateAPIView):
     queryset = Subject.objects.select_related('group').all().order_by('-created_at')
     serializer_class = SubjectSerializer
     pagination_class = StandardResultsSetPagination
+    permission_classes = [IsAdminOrReadOnly]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data, many = isinstance(request.data, list))
@@ -45,6 +46,7 @@ class SubjectViewSet(ListCreateAPIView):
 class SubjectDetailViewSet(ListAPIView):
     serializer_class = SubjectSerializer
     pagination_class = StandardResultsSetPagination
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
         group_id = self.kwargs.get('group_id')
@@ -56,6 +58,7 @@ class SubjectDetailViewSet(ListAPIView):
 class CategoryViewSet(ListCreateAPIView):
     queryset = Category.objects.select_related('subject','group').all().order_by('-created_at')
     pagination_class = StandardResultsSetPagination
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -73,6 +76,7 @@ class CategoryViewSet(ListCreateAPIView):
 class CategoryDetailsViewSet(ListAPIView):
     serializer_class = CategoryReadSerializer
     pagination_class = StandardResultsSetPagination
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
         subject_id = self.kwargs.get('subject_id')
@@ -83,6 +87,7 @@ class CategoryDetailsViewSet(ListAPIView):
 
 class SubCategoryViewSet(ListCreateAPIView):
     pagination_class = StandardResultsSetPagination
+    permission_classes = [IsAdminOrReadOnly]
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return SubCategoryWriteSerializer
@@ -100,6 +105,7 @@ class SubCategoryViewSet(ListCreateAPIView):
 class SubCategoryDetailsViewSet(ListAPIView):
     serializer_class = SubCategoryReadSerializer
     pagination_class = StandardResultsSetPagination
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
         category_id = self.kwargs.get('category_id')
@@ -110,6 +116,7 @@ class SubCategoryDetailsViewSet(ListAPIView):
 
 QUIZ_BATCH_SIZE = 50
 class QuestionViewSet(APIView):
+    permission_classes = [IsAdminOrReadOnly]
     
     def get_base_queryset(self, filters):
         group_id = filters.get('group_id')
@@ -188,6 +195,7 @@ class QuestionViewSet(APIView):
         return Response({'message': "Question session has been reset."}, status=status.HTTP_200_OK)
 
 class BulkQuestionUploadView(APIView):
+    permission_classes = [IsAdminOrReadOnly]
     def post(self, request, *args, **kwargs):
 
         if not isinstance(request.data, list):
