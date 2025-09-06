@@ -3,6 +3,22 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth.models import AnonymousUser
 from .models import AccessToken
 
+class AuthenticatedStudent:
+    """
+    A dummy user class for authenticated status.
+    It does not have a database table.
+    """
+    def __init__(self, token=None):
+        self.token = token
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
 class TokenAuthentication(BaseAuthentication):
     keyword = 'AccessKey'
     def authenticate(self, request):
@@ -20,8 +36,10 @@ class TokenAuthentication(BaseAuthentication):
             token = AccessToken.objects.get(key=token_key, is_active=True)
         except AccessToken.DoesNotExist:
             raise AuthenticationFailed("Ungültiges oder inaktives Token.")
+        
+        student = AuthenticatedStudent(token=token)
 
-        return (AnonymousUser(), token)
+        return (student, token)
 
     def authenticate_header(self, request):
         return self.keyword

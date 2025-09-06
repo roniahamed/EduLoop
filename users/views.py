@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import AccessToken
 
 
+
 class ValidateAccessTokenView(APIView):
     permission_classes = [AllowAny] 
 
