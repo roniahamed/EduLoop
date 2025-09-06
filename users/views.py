@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import AccessToken
+from rest_framework.permissions import IsAdminUser
+from rest_framework.authtoken.models import Token
 
 
 
@@ -18,3 +20,4 @@ class ValidateAccessTokenView(APIView):
             return Response({"message": "Das Token ist gültig."}, status=status.HTTP_200_OK)
         except AccessToken.DoesNotExist:
             return Response({"error": "Ungültiges oder inaktives Token."}, status=status.HTTP_400_BAD_REQUEST)
+        
