@@ -24,7 +24,7 @@ Eduloop is a Django-based educational platform designed for managing and organiz
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/roniahamed/EduLoop
    cd eduloop
    ```
 
