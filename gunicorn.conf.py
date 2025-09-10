@@ -2,7 +2,7 @@
 
 # Socket to bind to.
 # '0.0.0.0:8000' মানে হলো সব নেটওয়ার্ক ইন্টারফেসের 8000 পোর্টে সার্ভার চলবে।
-bind = "0.0.0.0:8008"
+bind = "ngrok http --url=giving-sacred-minnow.ngrok-free.app 8000"
 
 # Number of worker processes.
 # সাধারণত CPU কোরের সংখ্যার দ্বিগুণ + ১ রাখা হয়।
