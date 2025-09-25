@@ -22,6 +22,45 @@ Eduloop is a Django-based educational platform designed for managing and organiz
 
 ## Installation
 
+### Option 1: Docker (Recommended)
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/roniahamed/EduLoop
+   cd eduloop
+   ```
+
+2. Copy the environment file:
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Edit the `.env` file with your settings:
+   ```bash
+   nano .env  # or use your preferred editor
+   ```
+
+4. Build and run with Docker Compose:
+   ```bash
+   docker-compose up --build
+   ```
+
+5. Run migrations:
+   ```bash
+   docker-compose exec web python manage.py migrate
+   ```
+
+6. Create a superuser:
+   ```bash
+   docker-compose exec web python manage.py createsuperuser
+   ```
+
+7. Access the application:
+   - Web application: http://localhost:80
+   - Admin interface: http://localhost:80/admin/
+
+### Option 2: Local Development
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/roniahamed/EduLoop
@@ -80,13 +119,59 @@ For API consumers, the platform offers RESTful endpoints for programmatic access
 - Access the admin interface at `/admin/` to manage questions and access tokens.
 - Use the API endpoints to interact with the platform programmatically.
 
-## API Endpoints
+## Docker Setup
 
-### Authentication
+### Services
+- **web**: Django application running on Gunicorn (port 8010)
+- **db**: PostgreSQL database (port 5432)
+
+### Docker Commands
+
+```bash
+# Build and start all services
+docker-compose up --build
+
+# Start services in background
+docker-compose up -d
+
+# Stop all services
+docker-compose down
+
+# View logs
+docker-compose logs -f
+
+# Execute commands in the web container
+docker-compose exec web python manage.py shell
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py createsuperuser
+
+# Rebuild and restart
+docker-compose down
+docker-compose up --build
+
+# Clean up (removes containers, networks, and volumes)
+docker-compose down -v
+```
+
+### Environment Variables
+Copy `.env.example` to `.env` and configure:
+- `SECRET_KEY`: Django secret key
+- `DEBUG`: Set to False in production
+- `DB_NAME`: Database name
+- `DB_USER`: Database user
+- `DB_PASSWORD`: Database password
+
+## API Documentation
+
+For detailed API documentation, including request/response examples, authentication details, and endpoint specifications, see [docs/api.md](docs/api.md).
+
+### Quick API Endpoints Overview
+
+#### Authentication
 - `POST /api/token-verify/`: Validate an access token
 - `POST /api/api-token-auth/`: Obtain authentication token (if using DRF token auth)
 
-### Questions Management
+#### Questions Management
 - `GET/POST /api/groups/`: List or create groups
 - `GET/POST /api/subjects/`: List or create subjects
 - `GET /api/subject/{group_id}/`: List subjects for a specific group

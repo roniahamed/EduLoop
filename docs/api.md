@@ -140,7 +140,30 @@ Eduloop provides a RESTful API for managing educational questions in a hierarchi
 - **Auth Required:** Yes (read-only)
 - **Path Params:** `group_id` (integer)
 - **Query Params:** `page`, `page_size`
-- **Success Response (200):** Paginated subjects for the group
+- **Success Response (200):**
+  ```json
+  {
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+      {
+        "id": 1,
+        "name": "Algebra",
+        "description": "Algebra topics",
+        "group": "Mathematics",
+        "created_at": "2023-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "name": "Geometry",
+        "description": "Geometry topics",
+        "group": "Mathematics",
+        "created_at": "2023-01-01T00:00:00Z"
+      }
+    ]
+  }
+  ```
 - **Error Response (404):** Group not found
 
 ## Categories
@@ -175,7 +198,30 @@ Eduloop provides a RESTful API for managing educational questions in a hierarchi
 - **Auth Required:** Yes (read-only)
 - **Path Params:** `subject_id` (integer)
 - **Query Params:** `page`, `page_size`
-- **Success Response (200):** Paginated categories for the subject
+- **Success Response (200):**
+  ```json
+  {
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+      {
+        "id": 1,
+        "name": "Linear Equations",
+        "subject": "Algebra",
+        "group": "Mathematics",
+        "created_at": "2023-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "name": "Quadratic Equations",
+        "subject": "Algebra",
+        "group": "Mathematics",
+        "created_at": "2023-01-01T00:00:00Z"
+      }
+    ]
+  }
+  ```
 - **Error Response (404):** Subject not found
 
 ## Subcategories
@@ -211,7 +257,32 @@ Eduloop provides a RESTful API for managing educational questions in a hierarchi
 - **Auth Required:** Yes (read-only)
 - **Path Params:** `category_id` (integer)
 - **Query Params:** `page`, `page_size`
-- **Success Response (200):** Paginated subcategories for the category
+- **Success Response (200):**
+  ```json
+  {
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+      {
+        "id": 1,
+        "name": "Basic Linear Equations",
+        "category": "Linear Equations",
+        "subject": "Algebra",
+        "group": "Mathematics",
+        "created_at": "2023-01-01T00:00:00Z"
+      },
+      {
+        "id": 2,
+        "name": "Advanced Linear Equations",
+        "category": "Linear Equations",
+        "subject": "Algebra",
+        "group": "Mathematics",
+        "created_at": "2023-01-01T00:00:00Z"
+      }
+    ]
+  }
+  ```
 - **Error Response (404):** Category not found
 
 ## Questions
