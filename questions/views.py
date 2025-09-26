@@ -15,7 +15,7 @@ class StandardResultsSetPagination(PageNumberPagination):
 
 # Group View
 class GroupViewSet(ListCreateAPIView):
-    queryset = Group.objects.all().order_by('-created_at')
+    queryset = Group.objects.all().order_by('name')
     serializer_class = GroupSerializer
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
@@ -30,7 +30,7 @@ class GroupViewSet(ListCreateAPIView):
 # Subject View
 
 class SubjectViewSet(ListCreateAPIView):
-    queryset = Subject.objects.select_related('group').all().order_by('-created_at')
+    queryset = Subject.objects.select_related('group').all().order_by('name')
     serializer_class = SubjectSerializer
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
@@ -51,12 +51,12 @@ class SubjectDetailViewSet(ListAPIView):
     def get_queryset(self):
         group_id = self.kwargs.get('group_id')
         group = get_object_or_404(Group, id=group_id)
-        return Subject.objects.select_related('group').filter(group=group).order_by('-created_at')
+        return Subject.objects.select_related('group').filter(group=group).order_by('name')
     
 # Category View
 
 class CategoryViewSet(ListCreateAPIView):
-    queryset = Category.objects.select_related('subject','group').all().order_by('-created_at')
+    queryset = Category.objects.select_related('subject','group').all().order_by('name')
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
 
@@ -81,7 +81,7 @@ class CategoryDetailsViewSet(ListAPIView):
     def get_queryset(self):
         subject_id = self.kwargs.get('subject_id')
         subject = get_object_or_404(Subject, id=subject_id)
-        return Category.objects.select_related('subject','group').filter(subject=subject).order_by('-created_at')
+        return Category.objects.select_related('subject','group').filter(subject=subject).order_by('name')
 
 #  SubCategory 
 
@@ -93,7 +93,7 @@ class SubCategoryViewSet(ListCreateAPIView):
             return SubCategoryWriteSerializer
         return SubCategoryReadSerializer
     def get_queryset(self):
-        return SubCategory.objects.select_related('category','subject','group').all().order_by('-created_at')
+        return SubCategory.objects.select_related('category','subject','group').all().order_by('name')
     
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data, many = isinstance(request.data, list))
@@ -110,7 +110,7 @@ class SubCategoryDetailsViewSet(ListAPIView):
     def get_queryset(self):
         category_id = self.kwargs.get('category_id')
         category = get_object_or_404(Category, id=category_id)
-        return SubCategory.objects.select_related('category','subject','group').filter(category=category).order_by('-created_at')
+        return SubCategory.objects.select_related('category','subject','group').filter(category=category).order_by('name')
 
 #Question View 
 

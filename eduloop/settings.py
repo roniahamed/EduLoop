@@ -49,9 +49,13 @@ INSTALLED_APPS = [
     'teacher',
     'academy',
     'ai',
+
+    # Corsheaders
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -158,3 +162,22 @@ REST_FRAMEWORK = {
     'DATETIME_FORMAT': "%Y-%m-%dT%H:%M:%SZ"
 
 }   
+
+
+# Crosheaders 
+
+
+# Allow all (for testing)
+# CORS_ALLOW_ALL_ORIGINS = True
+
+# Or allow specific origin
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:6868",
+# ]
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://10.10.13.62:6868",
+    "http://localhost:6868",
+    "http://127.0.0.1:6868",
+]
