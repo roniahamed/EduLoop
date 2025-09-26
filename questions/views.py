@@ -81,7 +81,7 @@ class CategoryDetailsViewSet(ListAPIView):
     def get_queryset(self):
         subject_id = self.kwargs.get('subject_id')
         subject = get_object_or_404(Subject, id=subject_id)
-        return Category.objects.select_related('subject','group').filter(subject=subject).order_by('name')
+        return Category.objects.select_related('subject','group').prefetch_related('subcategories').filter(subject=subject).order_by('name')
 
 #  SubCategory 
 

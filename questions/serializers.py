@@ -2,6 +2,7 @@ from .models import Group, Subject, Category, SubCategory, Question
 from rest_framework import serializers
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+# from .models import SubCategoryReadSerializer
 
 # Group Serializer
 
@@ -38,14 +39,22 @@ class SubjectSerializer(serializers.ModelSerializer):
         return attrs
         
 
-# Category Serializer
 
+
+# SubCategory View Serializers 
+class SubCategoryReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubCategory
+        fields = ['id', 'name', 'category','subject', 'group', 'created_at']
+        read_only_fields = ['id', 'created_at', 'name', 'category','subject', 'group']
+
+# Category Serializer
+# Category Read Serializers 
 class CategoryReadSerializer(serializers.ModelSerializer):
-    subject = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    group = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    subcategories = SubCategoryReadSerializer(many=True, read_only = True)
     class Meta:
         model = Category
-        fields = ['id', 'name', 'subject','group', 'created_at']
+        fields = ['id', 'name', 'subject','group', 'created_at', 'subcategories']
         read_only_fields = ['id', 'created_at', 'name', 'subject', 'group']
 
 
@@ -83,14 +92,6 @@ class CategoryWriteSerializer(serializers.ModelSerializer):
 
 # SubCategory Serializer
 
-class SubCategoryReadSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    subject = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    group = serializers.SlugRelatedField(slug_field='name', read_only=True)
-    class Meta:
-        model = SubCategory
-        fields = ['id', 'name', 'category','subject', 'group', 'created_at']
-        read_only_fields = ['id', 'created_at', 'name', 'category','subject', 'group']
 
 class SubCategoryWriteSerializer(serializers.ModelSerializer):
     category = serializers.CharField()
