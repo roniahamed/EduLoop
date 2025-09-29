@@ -258,6 +258,13 @@ class BulkQuestionUploadView(APIView):
                 group=group, subject=subject, category=category, subcategory=subcategory,
                 level=item_data.get('level'), type=item_data.get('type'), metadata=item_data.get('metadata', {})
             ))
+        
+
+        if errors:
+            return Response({
+                "message": "Upload failed. Please fix the errors.",
+                "failed_items": errors
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
         created_questions = []
@@ -267,20 +274,14 @@ class BulkQuestionUploadView(APIView):
                 created_questions = Question.objects.bulk_create(questions_to_create)
             except Exception as e:
                 return Response({"error": f"An error occurred during database operation: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
         response_data = {
             "message": f"Successfully uploaded {len(created_questions)} out of {len(request.data)} questions."
         }
-        if errors:
-            response_data["failed_items"] = errors
 
-        if errors and not created_questions:
-            status_code = status.HTTP_400_BAD_REQUEST
-        elif errors and created_questions:
-            status_code = status.HTTP_207_MULTI_STATUS
-        else:
-            status_code = status.HTTP_201_CREATED
-
-        return Response(response_data, status=status_code)
+        return Response({
+            "message": f"Successfully uploaded {len(created_questions)} questions."
+        }, status=status.HTTP_201_CREATED)
 
 
 
