@@ -263,6 +263,7 @@ class BulkQuestionUploadView(APIView):
         if errors:
             return Response({
                 "message": "Upload failed. Please fix the errors.",
+                "Failed find: ": len(errors),
                 "failed_items": errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
