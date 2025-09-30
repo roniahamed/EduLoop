@@ -43,6 +43,9 @@ class SubjectSerializer(serializers.ModelSerializer):
 
 # SubCategory View Serializers 
 class SubCategoryReadSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    subject = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    group = serializers.SlugRelatedField(slug_field='name', read_only=True)
     class Meta:
         model = SubCategory
         fields = ['id', 'name', 'category','subject', 'group', 'created_at']
@@ -52,6 +55,9 @@ class SubCategoryReadSerializer(serializers.ModelSerializer):
 # Category Read Serializers 
 class CategoryReadSerializer(serializers.ModelSerializer):
     subcategories = SubCategoryReadSerializer(many=True, read_only = True)
+    subject = serializers.SlugRelatedField(slug_field='name', read_only=True)
+
+
     class Meta:
         model = Category
         fields = ['id', 'name', 'subject','group', 'created_at', 'subcategories']
