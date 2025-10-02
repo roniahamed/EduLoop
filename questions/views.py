@@ -8,6 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.views import APIView
 from .permissions import IsAdminOrReadOnly
+from django.contrib.sessions.backends.db import SessionStore
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
@@ -151,17 +152,43 @@ class QuestionViewSet(APIView):
         if not filters['group_id'] or not filters['subject_id']:
             return Response({"errors": "Selecting a group and at least one subject is mandatory."}, status=status.HTTP_400_BAD_REQUEST)
         
-        request.session['question_filter'] = filters 
-        request.session['seen_question_ids'] = []
-        request.session['question_batch'] = []
+        s = SessionStore()
+        s.create()
 
-        return self.get(request, *args, **kwargs)
+        s['question_filter'] = filters 
+        s['seen_question_ids'] = []
+        s['question_batch'] = []
+        s.save()
+
+        queryset = self.get_base_queryset(filters)
+        new_batch_ids = list(queryset.order_by('?').values_list('id', flat=True)[:QUIZ_BATCH_SIZE])
+
+        first_question_data = None
+
+        if new_batch_ids:
+            question_id = new_batch_ids.pop(0)
+            s['seen_question_ids'] = [question_id]
+            s['question_batch'] = new_batch_ids
+            s.save()
+            try:
+                question_obj = queryset.get(id=question_id)
+                serializer = QuestionDetailSerializer(question_obj)
+                first_question_data = serializer.data
+            except Question.DoesNotExist:
+                first_question_data = None
+
+        return Response({
+            'session_id': s.session_key,
+            'question': first_question_data
+        }, status=status.HTTP_200_OK)
+    
+
     
     def get(self, request, *args, **kwargs):
         filters = request.session.get('question_filter')
 
         if not filters:
-            return Response({'errors': "There is no active question session." }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'errors': "There is no active question this section." }, status=status.HTTP_400_BAD_REQUEST)
 
         question_batch = request.session.get('question_batch', [])
 
@@ -179,6 +206,7 @@ class QuestionViewSet(APIView):
             question_batch = new_batch_ids
 
             request.session['question_batch'] = question_batch
+
         question_id = question_batch.pop(0)
         request.session['question_batch'] = question_batch
         seen_ids = request.session.get('seen_question_ids', [])

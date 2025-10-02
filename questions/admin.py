@@ -1,7 +1,17 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
 from .models import Group, Subject, Category, SubCategory, Question
+from django.contrib.sessions.models import Session
 
+
+@admin.register(Session)
+class SessionAdmin(ModelAdmin):
+    def _session_data(self, obj):
+        return obj.get_decoded()
+    list_display = ('session_key', 'expire_date', '_session_data')
+    search_fields = ('session_key',)
+    ordering = ('-expire_date',)
+    list_per_page = 15
 @admin.register(Group)
 class GroupAdmin(ModelAdmin):
     list_display = ('id', 'name','description' ,'created_at')
