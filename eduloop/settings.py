@@ -58,7 +58,8 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     # 'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    # 'django.contrib.sessions.middleware.SessionMiddleware',
+    'questions.middleware.CustomSessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -181,3 +182,36 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:6868",
     "http://127.0.0.1:6868",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax' 
+
+# SESSION_COOKIE_SAMESITE = 'None'
+# CSRF_COOKIE_SAMESITE = 'None'
+
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://10.10.13.62:6868",
+    "http://10.10.13.60:8090",
+]
+
+USE_X_FORWARDED_HOST = True
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
+# CORS_EXPOSE_HEADERS = [
+#     'Content-Type',
+#     'X-CSRFToken', 
+#     'X-Requested-With',
+#     'Accept',
+#     'Origin',
+#     'Authorization',
+#     'Access-Control-Allow-Origin',
+#     'Access-Control-Allow-Credentials',
+# ]
