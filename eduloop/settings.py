@@ -202,6 +202,14 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 USE_X_FORWARDED_HOST = True
+from corsheaders.defaults import default_headers
+
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'x-session-id',
+]
+
+
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
