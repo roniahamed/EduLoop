@@ -1,6 +1,5 @@
 from .models import Group, Subject, Category, SubCategory, Question
-from rest_framework.exceptions import ValidationError
-from .serializers import GroupSerializer, SubjectSerializer, CategoryWriteSerializer,CategoryReadSerializer, SubCategoryReadSerializer, SubCategoryWriteSerializer, QuestionWriteSerializer, QuestionDetailSerializer
+from .serializers import GroupSerializer, SubjectSerializer, CategoryWriteSerializer,CategoryReadSerializer, SubCategoryReadSerializer, SubCategoryWriteSerializer, QuestionDetailSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
@@ -9,6 +8,8 @@ from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.views import APIView
 from .permissions import IsAdminOrReadOnly
 from django.contrib.sessions.backends.db import SessionStore
+from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
@@ -20,6 +21,7 @@ class GroupViewSet(ListCreateAPIView):
     serializer_class = GroupSerializer
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data, many = isinstance(request.data, list))
@@ -35,6 +37,7 @@ class SubjectViewSet(ListCreateAPIView):
     serializer_class = SubjectSerializer
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data, many = isinstance(request.data, list))
@@ -48,6 +51,7 @@ class SubjectDetailViewSet(ListAPIView):
     serializer_class = SubjectSerializer
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     def get_queryset(self):
         group_id = self.kwargs.get('group_id')
@@ -60,6 +64,7 @@ class CategoryViewSet(ListCreateAPIView):
     queryset = Category.objects.select_related('subject','group').all().order_by('name')
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -78,6 +83,7 @@ class CategoryDetailsViewSet(ListAPIView):
     serializer_class = CategoryReadSerializer
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     def get_queryset(self):
         subject_id = self.kwargs.get('subject_id')
@@ -89,6 +95,7 @@ class CategoryDetailsViewSet(ListAPIView):
 class SubCategoryViewSet(ListCreateAPIView):
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return SubCategoryWriteSerializer
@@ -107,6 +114,7 @@ class SubCategoryDetailsViewSet(ListAPIView):
     serializer_class = SubCategoryReadSerializer
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     def get_queryset(self):
         category_id = self.kwargs.get('category_id')
@@ -117,6 +125,8 @@ class SubCategoryDetailsViewSet(ListAPIView):
 
 QUIZ_BATCH_SIZE = 50
 class QuestionViewSet(APIView):
+    throttle_classes = [AnonRateThrottle]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     
     def get_base_queryset(self, filters):
         group_id = filters.get('group_id')
@@ -124,13 +134,11 @@ class QuestionViewSet(APIView):
         category_ids = filters.get('category_ids', [])
         subcategory_ids = filters.get('subcategory_ids', [])
         levels = filters.get('levels', [])
-        # print(levels)
 
         queryset = Question.objects.select_related('group', 'subject','category','subcategory').filter(group_id = group_id, subject_id = subject_id)
 
         if levels:
             queryset = queryset.filter(level__in=levels)
-            print(levels)
 
         if subcategory_ids:
             queryset = queryset.filter(subcategory__id__in = subcategory_ids)
