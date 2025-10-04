@@ -10,6 +10,9 @@ from .permissions import IsAdminOrReadOnly
 from django.contrib.sessions.backends.db import SessionStore
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
+# from rest_framework.permissions import IsAuthenticatedOrReadOnly
+# from users.authentication import TokenAuthentication, AuthenticatedStudent
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
@@ -125,8 +128,7 @@ class SubCategoryDetailsViewSet(ListAPIView):
 
 QUIZ_BATCH_SIZE = 50
 class QuestionViewSet(APIView):
-    throttle_classes = [AnonRateThrottle]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
     
     def get_base_queryset(self, filters):
         group_id = filters.get('group_id')

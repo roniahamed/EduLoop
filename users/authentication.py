@@ -18,6 +18,10 @@ class AuthenticatedStudent:
     @property
     def is_anonymous(self):
         return False
+    @property
+    def pk(self):
+        return self.token.key if self.token else None
+        
 
 class TokenAuthentication(BaseAuthentication):
     keyword = 'AccessKey'
