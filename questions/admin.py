@@ -12,6 +12,7 @@ class SessionAdmin(ModelAdmin):
     search_fields = ('session_key',)
     ordering = ('-expire_date',)
     list_per_page = 15
+    list_filter = ('expire_date',)
 @admin.register(Group)
 class GroupAdmin(ModelAdmin):
     list_display = ('id', 'name','description' ,'created_at')
