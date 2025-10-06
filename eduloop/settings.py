@@ -93,10 +93,10 @@ WSGI_APPLICATION = 'eduloop.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST', default='127.0.0.1'),
+        'NAME': config('POSTGRES_DB'),
+        'USER': config('POSTGRES_USER'),
+        'PASSWORD': config('POSTGRES_PASSWORD'),
+        'HOST': "localhost",  # Set to 'db' when using Docker, otherwise 'localhost'
         'PORT': config('DB_PORT', default='5432'),
     }
 }
@@ -195,8 +195,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://10.10.13.88:6868",
     "http://10.10.13.88:6869",
     "https://eduloop-samir-frontend.netlify.app",
-
-    ""
 ]
 
 CORS_ALLOW_CREDENTIALS = True
