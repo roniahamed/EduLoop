@@ -191,6 +191,12 @@ CORS_ALLOWED_ORIGINS = [
     "http://10.10.13.62:6868",
     "http://localhost:6868",
     "http://127.0.0.1:6868",
+    "https://eduloop-samir-frontend.vercel.app",
+    "http://10.10.13.88:6868",
+    "http://10.10.13.88:6869",
+    "https://eduloop-samir-frontend.netlify.app",
+
+    ""
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -209,6 +215,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://10.10.13.62:6868",
     "http://10.10.13.60:8090",
+    "https://eduloop-samir-frontend.vercel.app",
 ]
 
 USE_X_FORWARDED_HOST = True
