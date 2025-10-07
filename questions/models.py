@@ -81,6 +81,35 @@ class Question(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Question'
+        verbose_name_plural = 'Questions'
+        indexes = [
+
+            # Primary filtering indexes
+            models.Index(fields=['group'],name='q_group_idx'),
+            models.Index(fields=['subject'],name='q_subject_idx'),
+            models.Index(fields=['category'], name='q_category_idx'),
+
+            # Conditional subcategory index (only if frequently queried)
+            models.Index(fields=['subcategory'], condition= models.Q(subcategory__isnull=False),name='q_subcat_partial_idx'),
+
+            # common query patterns
+            models.Index(fields=['level', 'type'], name='q_level_type_idx'),
+            models.Index(fields=['created_at'], name='q_created_idx'),
+
+            # Composite indexes for complex queries
+
+            models.Index(fields=['group', 'subject', 'category'], name='question_gsc_idx'),
+            models.Index(fields=['group', 'subject'], name='question_gs_idx'),
+            models.Index(fields=['subject', 'category'], name='question_sc_idx'),
+            
+
+            models.Index(fields=['level'], name='q_level_idx'),
+            models.Index(fields=['type'], name='q_type_idx'),
+        ]
+
     def __str__(self):
         return f"Question {self.id} - {self.type} - {self.level}"
     
