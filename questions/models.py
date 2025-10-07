@@ -73,7 +73,7 @@ class Question(models.Model):
     subcategory = models.ForeignKey("SubCategory", on_delete=models.CASCADE, null=True, blank=True, related_name='questions')
     
     level = models.CharField(max_length=20, choices=LEVEL_CHOICES)
-    type = models.CharField(max_length=20)
+    type = models.CharField(max_length=200)
 
     # Question-specific data inside metadata
     metadata = models.JSONField(default=dict, blank=True)
