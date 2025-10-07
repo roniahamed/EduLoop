@@ -147,6 +147,10 @@ STATIC_ROOT = BASE_DIR/'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 20000  # Increase from default 1000
+
+
+
 # REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

@@ -61,3 +61,8 @@ class QuestionAdmin(ModelAdmin):
             'fields': ('type', 'level', 'metadata')
         }),
     )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related(
+            'group', 'subject', 'category', 'subcategory'
+        )
