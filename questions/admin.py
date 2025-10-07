@@ -8,11 +8,30 @@ from django.contrib.sessions.models import Session
 class SessionAdmin(ModelAdmin):
     def _session_data(self, obj):
         return obj.get_decoded()
-    list_display = ('session_key', 'expire_date', '_session_data')
+    
+    def is_expired(self, obj):
+        from django.utils import timezone
+        return obj.expire_date < timezone.now()
+    is_expired.boolean = True
+    
+    list_display = ('session_key', 'expire_date', 'is_expired', '_session_data')
     search_fields = ('session_key',)
     ordering = ('-expire_date',)
-    list_per_page = 15
+    list_per_page = 25
     list_filter = ('expire_date',)
+    show_full_result_count = False
+    
+    # Add custom action to delete expired sessions
+    actions = ['delete_expired_sessions']
+    
+    def delete_expired_sessions(self, request, queryset):
+        from django.utils import timezone
+        expired_count = Session.objects.filter(expire_date__lt=timezone.now()).count()
+        Session.objects.filter(expire_date__lt=timezone.now()).delete()
+        self.message_user(request, f"{expired_count} expired sessions deleted.")
+    delete_expired_sessions.short_description = "Delete expired sessions"
+
+
 @admin.register(Group)
 class GroupAdmin(ModelAdmin):
     list_display = ('id', 'name','description' ,'created_at')
