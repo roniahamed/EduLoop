@@ -78,7 +78,7 @@ class SubjectDetailViewSet(ListAPIView):
     def get_queryset(self):
         group_id = self.kwargs.get('group_id')
         group = get_object_or_404(Group, id=group_id)
-        return Subject.objects.select_related('group').filter(group=group).order_by('name')
+        return Subject.objects.select_related('group').prefetch_related('categories').filter(group=group).order_by('group__name', 'name')
     
 # Category View
 
