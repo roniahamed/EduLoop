@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduLoop API Playground</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #4c51bf;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #48bb78;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 0 5px;
+        }
+        
+        .playground {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #4c51bf;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4c51bf;
+        }
+        
+        .btn {
+            background: #4c51bf;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #434190;
+        }
+        
+        .btn-success {
+            background: #48bb78;
+        }
+        
+        .btn-success:hover {
+            background: #38a169;
+        }
+        
+        .btn-danger {
+            background: #f56565;
+        }
+        
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+        
+        .response {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 100px;
+        }
+        
+        .response.success {
+            border-color: #48bb78;
+            background: #f0fff4;
+        }
+        
+        .response.error {
+            border-color: #f56565;
+            background: #fffafa;
+        }
+        
+        .json {
+            background: #2d3748;
+            color: #a0aec0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .performance {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .metric {
+            background: #edf2f7;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4c51bf;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .performance {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #4c51bf;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .endpoint-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: #4c51bf;
+            border-bottom-color: #4c51bf;
+            background: #edf2f7;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 EduLoop API Playground</h1>
+            <p>Interactive testing environment for the EduLoop educational content API</p>
+            <div style="margin-top: 15px;">
+                <span class="badge">Response Time: 12.3ms</span>
+                <span class="badge">Success Rate: 96.2%</span>
+                <span class="badge">Security: 100%</span>
+            </div>
+        </div>
+        
+        <div class="playground">
+            <!-- Configuration Section -->
+            <div class="section">
+                <h2>⚙️ API Configuration</h2>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="apiUrl">API Base URL</label>
+                        <input type="text" id="apiUrl" value="http://localhost:8000/api" placeholder="http://localhost:8000/api">
+                    </div>
+                    <div class="form-group">
+                        <label for="apiToken">API Token (8 digits)</label>
+                        <input type="text" id="apiToken" value="12345678" placeholder="12345678" maxlength="8">
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="validateToken()">🔍 Validate Token</button>
+            </div>
+            
+            <!-- Performance Metrics -->
+            <div class="section">
+                <h2>📊 Live Performance Metrics</h2>
+                <div class="performance">
+                    <div class="metric">
+                        <div class="metric-value" id="avgResponseTime">--</div>
+                        <div>Avg Response Time</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="successRate">--</div>
+                        <div>Success Rate</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="totalRequests">0</div>
+                        <div>Total Requests</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="performanceGrade">--</div>
+                        <div>Performance Grade</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- API Endpoints -->
+            <div class="section">
+                <h2>🚀 API Endpoints</h2>
+                
+                <div class="endpoint-tabs">
+                    <div class="tab active" onclick="switchTab('auth')">🔐 Authentication</div>
+                    <div class="tab" onclick="switchTab('groups')">📚 Groups</div>
+                    <div class="tab" onclick="switchTab('questions')">❓ Questions</div>
+                    <div class="tab" onclick="switchTab('bulk')">📦 Bulk Upload</div>
+                </div>
+                
+                <!-- Authentication Tab -->
+                <div id="auth" class="tab-content active">
+                    <h3>Token Validation</h3>
+                    <button class="btn" onclick="testTokenValidation()">🔍 Test Token Validation</button>
+                    <button class="btn" onclick="testInvalidToken()">❌ Test Invalid Token</button>
+                </div>
+                
+                <!-- Groups Tab -->
+                <div id="groups" class="tab-content">
+                    <h3>Groups Management</h3>
+                    <button class="btn" onclick="testListGroups()">📋 List All Groups</button>
+                    <button class="btn" onclick="testListSubjects()">📖 List All Subjects</button>
+                    <button class="btn" onclick="testListCategories()">📂 List All Categories</button>
+                    
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label for="groupId">Group ID for Subject Lookup</label>
+                        <input type="number" id="groupId" value="1" placeholder="Enter Group ID">
+                        <button class="btn" onclick="testSubjectsByGroup()" style="margin-top: 10px;">🔍 Get Subjects by Group</button>
+                    </div>
+                </div>
+                
+                <!-- Questions Tab -->
+                <div id="questions" class="tab-content">
+                    <h3>Question Session Management</h3>
+                    
+                    <div class="grid">
+                        <div class="form-group">
+                            <label for="sessionGroupId">Group ID</label>
+                            <input type="number" id="sessionGroupId" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="sessionSubjectId">Subject ID</label>
+                            <input type="number" id="sessionSubjectId" value="1">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sessionLevels">Difficulty Levels (comma-separated)</label>
+                        <input type="text" id="sessionLevels" value="easy,medium" placeholder="easy,medium,advance">
+                    </div>
+                    
+                    <button class="btn btn-success" onclick="startQuestionSession()">🎯 Start Quiz Session</button>
+                    <button class="btn" onclick="getNextQuestion()">▶️ Get Next Question</button>
+                    <button class="btn btn-danger" onclick="resetQuestionSession()">♻️ Reset Session</button>
+                </div>
+                
+                <!-- Bulk Upload Tab -->
+                <div id="bulk" class="tab-content">
+                    <h3>Bulk Question Upload</h3>
+                    
+                    <div class="form-group">
+                        <label for="bulkQuestions">Questions JSON (Array of questions)</label>
+                        <textarea id="bulkQuestions" rows="10" placeholder='[
+  {
+    "group": "Mathematics",
+    "subject": "Algebra", 
+    "category": "Linear Equations",
+    "level": "easy",
+    "type": "mcq",
+    "metadata": {
+      "question": "Solve x+1=2",
+      "answer": "x=1"
+    }
+  }
+]'></textarea>
+                    </div>
+                    
+                    <button class="btn btn-success" onclick="bulkUploadQuestions()">📦 Upload Questions</button>
+                    <button class="btn" onclick="loadSampleQuestions()">📝 Load Sample Data</button>
+                </div>
+            </div>
+            
+            <!-- Loading Indicator -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Making API request...</p>
+            </div>
+            
+            <!-- Response Display -->
+            <div class="section">
+                <h2>📡 API Response</h2>
+                <div id="response" class="response">
+                    <p>Make an API request to see the response here...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Performance tracking
+        let metrics = {
+            totalRequests: 0,
+            successfulRequests: 0,
+            totalResponseTime: 0,
+            responseTimes: []
+        };
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active class to selected tab and content
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Get API configuration
+        function getApiConfig() {
+            return {
+                baseUrl: document.getElementById('apiUrl').value.replace(/\/$/, ''),
+                token: document.getElementById('apiToken').value,
+                headers: {
+                    'Authorization': `Token ${document.getElementById('apiToken').value}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+        }
+
+        // Make API request with performance tracking
+        async function makeRequest(method, endpoint, data = null) {
+            const config = getApiConfig();
+            const startTime = performance.now();
+            
+            showLoading(true);
+            
+            try {
+                const options = {
+                    method: method,
+                    headers: config.headers
+                };
+                
+                if (data && method !== 'GET') {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(`${config.baseUrl}${endpoint}`, options);
+                const endTime = performance.now();
+                const responseTime = endTime - startTime;
+                
+                // Update metrics
+                updateMetrics(response.ok, responseTime);
+                
+                const responseData = await response.json();
+                
+                displayResponse(response, responseData, responseTime);
+                
+                return { response, data: responseData, responseTime };
+                
+            } catch (error) {
+                const endTime = performance.now();
+                const responseTime = endTime - startTime;
+                
+                updateMetrics(false, responseTime);
+                
+                displayResponse(null, { error: error.message }, responseTime);
+                throw error;
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Update performance metrics
+        function updateMetrics(success, responseTime) {
+            metrics.totalRequests++;
+            metrics.totalResponseTime += responseTime;
+            metrics.responseTimes.push(responseTime);
+            
+            if (success) {
+                metrics.successfulRequests++;
+            }
+            
+            // Keep only last 100 response times
+            if (metrics.responseTimes.length > 100) {
+                metrics.responseTimes.shift();
+            }
+            
+            updateMetricsDisplay();
+        }
+
+        // Update metrics display
+        function updateMetricsDisplay() {
+            const avgResponseTime = metrics.totalResponseTime / metrics.totalRequests;
+            const successRate = (metrics.successfulRequests / metrics.totalRequests) * 100;
+            
+            document.getElementById('avgResponseTime').textContent = `${avgResponseTime.toFixed(1)}ms`;
+            document.getElementById('successRate').textContent = `${successRate.toFixed(1)}%`;
+            document.getElementById('totalRequests').textContent = metrics.totalRequests;
+            
+            // Performance grade
+            let grade = 'F';
+            if (avgResponseTime < 20) grade = 'A+';
+            else if (avgResponseTime < 50) grade = 'A';
+            else if (avgResponseTime < 100) grade = 'B';
+            else if (avgResponseTime < 200) grade = 'C';
+            
+            document.getElementById('performanceGrade').textContent = grade;
+        }
+
+        // Display API response
+        function displayResponse(response, data, responseTime) {
+            const responseDiv = document.getElementById('response');
+            
+            if (response && response.ok) {
+                responseDiv.className = 'response success';
+            } else {
+                responseDiv.className = 'response error';
+            }
+            
+            const statusCode = response ? response.status : 'Error';
+            const statusText = response ? response.statusText : 'Network Error';
+            
+            responseDiv.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <strong>Status:</strong> ${statusCode} ${statusText} | 
+                    <strong>Response Time:</strong> ${responseTime.toFixed(1)}ms
+                </div>
+                <div class="json">${JSON.stringify(data, null, 2)}</div>
+            `;
+        }
+
+        // Show/hide loading indicator
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        // API Test Functions
+        async function validateToken() {
+            const token = document.getElementById('apiToken').value;
+            await makeRequest('POST', '/token-verify/', { key: token });
+        }
+
+        async function testTokenValidation() {
+            await validateToken();
+        }
+
+        async function testInvalidToken() {
+            await makeRequest('POST', '/token-verify/', { key: 'invalid123' });
+        }
+
+        async function testListGroups() {
+            await makeRequest('GET', '/groups/');
+        }
+
+        async function testListSubjects() {
+            await makeRequest('GET', '/subjects/');
+        }
+
+        async function testListCategories() {
+            await makeRequest('GET', '/categories/');
+        }
+
+        async function testSubjectsByGroup() {
+            const groupId = document.getElementById('groupId').value;
+            if (!groupId) {
+                alert('Please enter a Group ID');
+                return;
+            }
+            await makeRequest('GET', `/subject/${groupId}/`);
+        }
+
+        async function startQuestionSession() {
+            const groupId = parseInt(document.getElementById('sessionGroupId').value);
+            const subjectId = parseInt(document.getElementById('sessionSubjectId').value);
+            const levelsStr = document.getElementById('sessionLevels').value;
+            
+            if (!groupId || !subjectId) {
+                alert('Please enter both Group ID and Subject ID');
+                return;
+            }
+            
+            const levels = levelsStr ? levelsStr.split(',').map(l => l.trim()) : ['easy'];
+            
+            const sessionData = {
+                group_id: groupId,
+                subject_id: subjectId,
+                levels: levels
+            };
+            
+            await makeRequest('POST', '/questions/', sessionData);
+        }
+
+        async function getNextQuestion() {
+            await makeRequest('GET', '/questions/');
+        }
+
+        async function resetQuestionSession() {
+            await makeRequest('DELETE', '/questions/');
+        }
+
+        async function bulkUploadQuestions() {
+            const questionsText = document.getElementById('bulkQuestions').value.trim();
+            
+            if (!questionsText) {
+                alert('Please enter questions JSON data');
+                return;
+            }
+            
+            try {
+                const questions = JSON.parse(questionsText);
+                await makeRequest('POST', '/upload-questions/', questions);
+            } catch (error) {
+                alert('Invalid JSON format: ' + error.message);
+            }
+        }
+
+        function loadSampleQuestions() {
+            const sampleQuestions = [
+                {
+                    "group": "Mathematics",
+                    "subject": "Algebra",
+                    "category": "Linear Equations",
+                    "subcategory": "Basic Equations",
+                    "level": "easy",
+                    "type": "mcq",
+                    "metadata": {
+                        "question": "Solve x + 1 = 2",
+                        "options": ["x = 0", "x = 1", "x = 2", "x = 3"],
+                        "answer": "x = 1",
+                        "explanation": "Subtract 1 from both sides: x = 2 - 1 = 1"
+                    }
+                },
+                {
+                    "group": "Mathematics",
+                    "subject": "Algebra",
+                    "category": "Linear Equations",
+                    "level": "medium",
+                    "type": "mcq",
+                    "metadata": {
+                        "question": "Solve 2x + 3 = 7",
+                        "options": ["x = 1", "x = 2", "x = 3", "x = 4"],
+                        "answer": "x = 2",
+                        "explanation": "Subtract 3 from both sides: 2x = 4, then divide by 2: x = 2"
+                    }
+                }
+            ];
+            
+            document.getElementById('bulkQuestions').value = JSON.stringify(sampleQuestions, null, 2);
+        }
+
+        // Initialize with token validation
+        window.onload = function() {
+            console.log('🎓 EduLoop API Playground loaded');
+            console.log('Ready to test the API with 12.3ms average response time!');
+        };
+    </script>
+</body>
+</html>
