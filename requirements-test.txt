@@ -1,0 +1,23 @@
+# Testing Dependencies for EduLoop
+# Add these to your requirements.txt or create requirements-test.txt
+
+# Core testing
+freezegun==1.3.1      # Time mocking for date/time tests
+factory-boy==3.3.0    # Test data factories
+coverage==7.3.2       # Test coverage reporting
+pytest==7.4.2         # Alternative test runner
+pytest-django==4.6.0  # Django integration for pytest
+pytest-cov==4.1.0     # Coverage plugin for pytest
+
+# Performance testing
+locust==2.17.0        # Load testing framework
+memory-profiler==0.61.0  # Memory usage profiling
+
+# Security testing
+bandit==1.7.5         # Security linting
+safety==2.3.5         # Check for known security vulnerabilities
+
+# Code quality
+flake8==6.1.0         # Code linting
+black==23.9.1         # Code formatting
+isort==5.12.0         # Import sorting
