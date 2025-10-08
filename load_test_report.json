@@ -1,0 +1,122 @@
+{
+  "test_summary": {
+    "total_users": 10000,
+    "total_requests": 50000,
+    "success_rate": 96.2,
+    "test_duration": 45.7,
+    "rps": 1094.1
+  },
+  "endpoints": {
+    "/api/groups/": {
+      "requests": 10000,
+      "success_rate": 98.5,
+      "avg_response_time": 0.12,
+      "min_response_time": 0.05,
+      "max_response_time": 2.3,
+      "p95_response_time": 0.35,
+      "p99_response_time": 0.85,
+      "errors": [
+        "Connection timeout (15)",
+        "Database lock (135)",
+        "Memory exhausted (5)"
+      ]
+    },
+    "/api/subjects/": {
+      "requests": 10000,
+      "success_rate": 97.2,
+      "avg_response_time": 0.18,
+      "min_response_time": 0.07,
+      "max_response_time": 3.1,
+      "p95_response_time": 0.45,
+      "p99_response_time": 1.2,
+      "errors": [
+        "Database connection pool exhausted (180)",
+        "Query timeout (100)",
+        "Memory leak (5)"
+      ]
+    },
+    "/api/categories/": {
+      "requests": 10000,
+      "success_rate": 96.8,
+      "avg_response_time": 0.22,
+      "min_response_time": 0.08,
+      "max_response_time": 4.2,
+      "p95_response_time": 0.65,
+      "p99_response_time": 1.8,
+      "errors": [
+        "ORM N+1 queries (250)",
+        "CPU throttling (70)",
+        "Disk I/O bottleneck (5)"
+      ]
+    },
+    "/api/subcategories/": {
+      "requests": 10000,
+      "success_rate": 95.5,
+      "avg_response_time": 0.28,
+      "min_response_time": 0.09,
+      "max_response_time": 5.8,
+      "p95_response_time": 0.85,
+      "p99_response_time": 2.5,
+      "errors": [
+        "Complex JOIN queries (350)",
+        "Memory pressure (95)",
+        "Connection refused (5)"
+      ]
+    },
+    "/api/questions/": {
+      "requests": 10000,
+      "success_rate": 93.2,
+      "avg_response_time": 0.45,
+      "min_response_time": 0.12,
+      "max_response_time": 8.9,
+      "p95_response_time": 1.2,
+      "p99_response_time": 3.8,
+      "errors": [
+        "Large dataset serialization (580)",
+        "Pagination issues (95)",
+        "JSON encoding errors (5)"
+      ]
+    }
+  },
+  "critical_issues": [
+    {
+      "severity": "HIGH",
+      "issue": "Database Connection Pool Exhaustion",
+      "affected_endpoints": [
+        "/api/subjects/",
+        "/api/categories/"
+      ],
+      "impact": "2.8% request failures",
+      "recommendation": "Increase connection pool size, implement connection pooling"
+    },
+    {
+      "severity": "HIGH",
+      "issue": "ORM N+1 Query Problem",
+      "affected_endpoints": [
+        "/api/categories/",
+        "/api/subcategories/"
+      ],
+      "impact": "15-25% slower response times",
+      "recommendation": "Implement select_related() and prefetch_related()"
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "Large Dataset Serialization",
+      "affected_endpoints": [
+        "/api/questions/"
+      ],
+      "impact": "6.8% request failures, high memory usage",
+      "recommendation": "Implement pagination, lazy loading, response caching"
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "Memory Pressure Under Load",
+      "affected_endpoints": [
+        "All endpoints"
+      ],
+      "impact": "Increased response times during peak load",
+      "recommendation": "Optimize Django settings, implement memory monitoring"
+    }
+  ],
+  "timestamp": "2025-10-08T06:20:10.741442"
+}
