@@ -9,16 +9,21 @@ from rest_framework.views import APIView
 from .permissions import IsAdminOrReadOnly
 from django.contrib.sessions.backends.db import SessionStore
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from django.core.cache import cache 
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+from django.db import transaction
 
 # from rest_framework.permissions import IsAuthenticatedOrReadOnly
 # from users.authentication import TokenAuthentication, AuthenticatedStudent
 class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 10
+    page_size = 20
     page_size_query_param = 'page_size'
     max_page_size = 100
 
 # Group View
+
+@method_decorator(cache_page(60 * 15), name='dispatch')  # Cache for 15 minutes
 class GroupViewSet(ListCreateAPIView):
     queryset = Group.objects.all().order_by('name')
     serializer_class = GroupSerializer
@@ -32,6 +37,20 @@ class GroupViewSet(ListCreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    def get_queryset(self):
+        cache_key = 'groups_list'
+        queryset = cache.get(cache_key)
+        
+        if not queryset:
+            queryset = Group.objects.all().order_by('name')
+            cache.set(cache_key, list(queryset), 60 * 15)  # Cache for 15 minutes
+            
+        return queryset
+    
+    def perform_create(self, serializer):
+        super().perform_create(serializer)
+        cache.delete('groups_list')
     
 # Subject View
 
