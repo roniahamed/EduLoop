@@ -55,7 +55,7 @@ class GroupViewSet(ListCreateAPIView):
 # Subject View
 
 class SubjectViewSet(ListCreateAPIView):
-    queryset = Subject.objects.select_related('group').all().order_by('name')
+    queryset = Subject.objects.select_related('group').all().order_by('group__name','name')
     serializer_class = SubjectSerializer
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
@@ -83,7 +83,7 @@ class SubjectDetailViewSet(ListAPIView):
 # Category View
 
 class CategoryViewSet(ListCreateAPIView):
-    queryset = Category.objects.select_related('subject','group').all().order_by('name')
+    queryset = Category.objects.select_related('subject','group').prefetch_related('subcategories').all().order_by('name')
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
