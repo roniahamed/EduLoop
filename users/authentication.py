@@ -28,8 +28,12 @@ class TokenAuthentication(BaseAuthentication):
     def authenticate(self, request):
         auth_header = request.headers.get('Authorization')
 
-        if not auth_header or not auth_header.startswith(self.keyword + ' '):
+        if not auth_header:
             return None
+        
+
+        if not auth_header.startswith(self.keyword + ' '):
+            raise AuthenticationFailed("Invalid authorization header format.")
 
         try:
             _, token_key = auth_header.split()
