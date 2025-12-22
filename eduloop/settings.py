@@ -26,7 +26,8 @@ SECRET_KEY = config('SECRET_KEY', default='asdfasdfasdfasdf340897iuhkndkjry89ulk
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+#ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 
 
 # Application definition
@@ -206,32 +207,25 @@ REST_FRAMEWORK = {
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://10.10.13.62:6868",
-    "http://localhost:6868",
-    "http://127.0.0.1:6868",
-    "https://eduloop-samir-frontend.vercel.app",
-    "http://10.10.13.88:6868",
-    "http://10.10.13.88:6869",
-    "https://eduloop-samir-frontend.netlify.app",
+    "https://extrahanden.ai",
+    "http://extrahanden.ai",
+    "https://www.extrahanden.ai",
+
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_SAMESITE = 'Lax' 
-
-# SESSION_COOKIE_SAMESITE = 'None'
-# CSRF_COOKIE_SAMESITE = 'None'
-
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
-
+CSRF_COOKIE_DOMAIN = ".extrahanden.ai"
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-    "http://10.10.13.62:6868",
-    "http://10.10.13.60:8090",
     "https://eduloop-samir-frontend.vercel.app",
+    "https://extrahanden.ai",
+    "https://www.extrahanden.ai",
+    "http://extrahanden.ai",
 ]
 
 USE_X_FORWARDED_HOST = True

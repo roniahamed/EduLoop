@@ -9,3 +9,16 @@ psycopg2-binary==2.9.10
 python-decouple==3.8
 sqlparse==0.5.3
 whitenoise==6.9.0
+asgiref==3.9.1
+Django==5.2.5
+django-cors-headers==4.9.0
+django-redis==6.0.0
+django-unfold==0.65.0
+djangorestframework==3.16.1
+gunicorn==23.0.0
+packaging==25.0
+psycopg2-binary==2.9.10
+python-decouple==3.8
+redis==6.4.0
+sqlparse==0.5.3
+whitenoise==6.9.0
