@@ -36,3 +36,26 @@ class List_Of_AccessTokens(APIView):
         token_list = [{"key": token.key, "description": token.description, "is_active": token.is_active, "created_at": token.created_at} for token in tokens]
         return Response(token_list, status=status.HTTP_200_OK)
     
+class UpdateAccessTokenView(APIView):
+    permission_classes = [IsAdminUser]  
+
+    def put(self, request, *args, **kwargs):
+        token_key = request.data.get('key')
+        is_active = request.data.get('is_active')
+        description = request.data.get('description', '')
+        new_key = request.data.get('new_key', None)
+
+        if not token_key:
+            return Response({"error": "Token-Schlüssel muss angegeben werden."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            token = AccessToken.objects.get(key=token_key)
+            if is_active is not None:
+                token.is_active = is_active
+            if new_key:
+                token.key = new_key
+            token.description = description
+            token.save()
+            return Response({"message": "Token erfolgreich aktualisiert."}, status=status.HTTP_200_OK)
+        except AccessToken.DoesNotExist:
+            return Response({"error": "Token nicht gefunden."}, status=status.HTTP_404_NOT_FOUND)
