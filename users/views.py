@@ -59,3 +59,20 @@ class UpdateAccessTokenView(APIView):
             return Response({"message": "Token erfolgreich aktualisiert."}, status=status.HTTP_200_OK)
         except AccessToken.DoesNotExist:
             return Response({"error": "Token nicht gefunden."}, status=status.HTTP_404_NOT_FOUND)
+        
+class DeleteAccessTokenView(APIView):
+    permission_classes = [IsAdminUser]  
+
+    def delete(self, request, *args, **kwargs):
+        token_key = request.data.get('key')
+
+        if not token_key:
+            return Response({"error": "Token-Schlüssel muss angegeben werden."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            token = AccessToken.objects.get(key=token_key)
+            token.delete()
+            return Response({"message": "Token erfolgreich gelöscht."}, status=status.HTTP_200_OK)
+        except AccessToken.DoesNotExist:
+            return Response({"error": "Token nicht gefunden."}, status=status.HTTP_404_NOT_FOUND)
+
