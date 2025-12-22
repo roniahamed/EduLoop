@@ -7,4 +7,5 @@ urlpatterns = [
     # path('',include('rest_framework.urls')),
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('token-generate/', GenerateAccessTokenView.as_view(), name='generate-token'),
+    path('token-list/', List_Of_AccessTokens.as_view(), name='list-tokens'),
 ]
