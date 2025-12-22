@@ -27,4 +27,12 @@ class GenerateAccessTokenView(APIView):
     def post(self, request, *args, **kwargs):
         token = AccessToken.objects.create()
         return Response({"key": token.key}, status=status.HTTP_201_CREATED)
+
+class List_Of_AccessTokens(APIView):
+    permission_classes = [IsAdminUser]  
+
+    def get(self, request, *args, **kwargs):
+        tokens = AccessToken.objects.all()
+        token_list = [{"key": token.key, "description": token.description, "is_active": token.is_active, "created_at": token.created_at} for token in tokens]
+        return Response(token_list, status=status.HTTP_200_OK)
     
