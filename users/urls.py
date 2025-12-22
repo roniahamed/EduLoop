@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ValidateAccessTokenView, GenerateAccessTokenView, List_Of_AccessTokens
+from .views import ValidateAccessTokenView, GenerateAccessTokenView, List_Of_AccessTokens, UpdateAccessTokenView
 from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
@@ -8,4 +8,5 @@ urlpatterns = [
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('token-generate/', GenerateAccessTokenView.as_view(), name='generate-token'),
     path('token-list/', List_Of_AccessTokens.as_view(), name='list-tokens'),
+    path('token-update/', UpdateAccessTokenView.as_view(), name='update-token'),
 ]
