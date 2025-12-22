@@ -21,3 +21,10 @@ class ValidateAccessTokenView(APIView):
         except AccessToken.DoesNotExist:
             return Response({"error": "Ungültiges oder inaktives Token."}, status=status.HTTP_400_BAD_REQUEST)
         
+class GenerateAccessTokenView(APIView):
+    permission_classes = [IsAdminUser]  
+
+    def post(self, request, *args, **kwargs):
+        token = AccessToken.objects.create()
+        return Response({"key": token.key}, status=status.HTTP_201_CREATED)
+    
