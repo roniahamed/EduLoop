@@ -1,6 +1,10 @@
 from django.urls import path, include
-from .views import ValidateAccessTokenView, GenerateAccessTokenView, List_Of_AccessTokens, UpdateAccessTokenView, DeleteAccessTokenView
+from .views import ValidateAccessTokenView, GenerateAccessTokenView, List_Of_AccessTokens, UpdateAccessTokenView, DeleteAccessTokenView, UserViewSet
 from rest_framework.authtoken.views import obtain_auth_token
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'users', UserViewSet, basename='user')
 
 urlpatterns = [
     path('token-verify/', ValidateAccessTokenView.as_view(), name='validate-token'),
@@ -10,4 +14,6 @@ urlpatterns = [
     path('token-list/', List_Of_AccessTokens.as_view(), name='list-tokens'),
     path('token-update/', UpdateAccessTokenView.as_view(), name='update-token'),
     path('token-delete/', DeleteAccessTokenView.as_view(), name='delete-token'),
+    path('', include(router.urls)),
+    
 ]
