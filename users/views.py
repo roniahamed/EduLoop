@@ -5,7 +5,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import AccessToken
 from rest_framework.permissions import IsAdminUser
 from rest_framework.authtoken.models import Token
-
+from django.contrib.auth.models import User
+from .serializers import UserSerializer
+from rest_framework.viewsets import ModelViewSet
 
 
 class ValidateAccessTokenView(APIView):
@@ -76,3 +78,8 @@ class DeleteAccessTokenView(APIView):
         except AccessToken.DoesNotExist:
             return Response({"error": "Token nicht gefunden."}, status=status.HTTP_404_NOT_FOUND)
 
+# User  
+class UserViewSet(ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAdminUser]
