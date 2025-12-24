@@ -1,5 +1,5 @@
 from .models import Group, Subject, Category, SubCategory, Question
-from .serializers import GroupSerializer, SubjectSerializer, CategoryWriteSerializer,CategoryReadSerializer, SubCategoryReadSerializer, SubCategoryWriteSerializer, QuestionDetailSerializer
+from .serializers import GroupSerializer, SubjectSerializer, CategoryWriteSerializer,CategoryReadSerializer, SubCategoryReadSerializer, SubCategoryWriteSerializer, QuestionDetailSerializer, QuestionListSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
@@ -374,4 +374,14 @@ class Home_Dashboard(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
+class Question_Dashboard(APIView):
+    permission_classes = [IsAdminUser]
+    filter_backends = []
+    ordering_fields = ['created_at', 'group__name', 'subject__name', 'category__name', 'subcategory__name']
+    search_fields = ['group__name', 'subject__name', 'category__name', 'subcategory__name']
+    filterset_fields = ['level', 'type', 'group__id', 'subject__id', 'category__id', 'subcategory__id']
 
+    def get(self, request, *args, **kwargs):
+        questions = Question.objects.select_related('group', 'subject', 'category', 'subcategory').all().order_by('-created_at')[:10]
+        serializer = QuestionListSerializer(questions, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
