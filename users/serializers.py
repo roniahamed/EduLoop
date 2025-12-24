@@ -11,11 +11,19 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'password', 'confirm_password']
     
     def validate(self, data):
+
+        if not 'password' in data and not 'confirm_password' in data:
+
+            raise serializers.ValidationError("Passwort und Bestätigung müssen angegeben werden.")
+        
         if data['password'] != data.pop('confirm_password'):
+
             raise serializers.ValidationError("Die Passwörter stimmen nicht überein.")
         
         if 'password' not in data or len(data['password']) < 8:
+
             raise serializers.ValidationError("Das Passwort muss mindestens 8 Zeichen lang sein.")
+        
         return data
     
     def create(self, validated_data):
