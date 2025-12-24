@@ -90,3 +90,9 @@ class CurrentUserView(APIView):
     def get(self, request, *args, **kwargs):
         serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def delete(self, request, *args, **kwargs):
+        user = request.user
+        user.delete()
+        return Response({"message": "Benutzerkonto erfolgreich gelöscht."}, status=status.HTTP_200_OK)
+    
