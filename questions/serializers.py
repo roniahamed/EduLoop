@@ -211,3 +211,9 @@ class QuestionDetailSerializer(serializers.ModelSerializer):
         read_only_fields = fields
         
 
+class QuestionListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ['id', 'group', 'subject', 'category', 'subcategory', 'level', 'type', 'created_at']
+        read_only_fields = fields
+    
