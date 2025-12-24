@@ -12,17 +12,21 @@ class UserSerializer(serializers.ModelSerializer):
     
     def validate(self, data):
 
-        if not 'password' in data and not 'confirm_password' in data:
+        password = data.get('password', None)
+        confirm_password = data.get('confirm_password', None)
 
-            raise serializers.ValidationError("Passwort und Bestätigung müssen angegeben werden.")
+        if self.instance is None or 'password' in data:
+
+
         
-        if data['password'] != data.pop('confirm_password'):
+            if password is None or password != confirm_password:
 
-            raise serializers.ValidationError("Die Passwörter stimmen nicht überein.")
+                raise serializers.ValidationError("Die Passwörter stimmen nicht überein.")
         
-        if 'password' not in data or len(data['password']) < 8:
+            if len(password) < 8:
 
-            raise serializers.ValidationError("Das Passwort muss mindestens 8 Zeichen lang sein.")
+                raise serializers.ValidationError("Das Passwort muss mindestens 8 Zeichen lang sein.")
+            data.pop('confirm_password', None)
         
         return data
     
@@ -30,4 +34,13 @@ class UserSerializer(serializers.ModelSerializer):
         password = validated_data.pop('password')
         user = User.objects.create_user(**validated_data, password=password)
         return user
+    
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance
     
