@@ -1,4 +1,4 @@
-from .views import GroupViewSet, SubjectViewSet, CategoryViewSet, SubCategoryViewSet, QuestionViewSet, BulkQuestionUploadView, SubjectDetailViewSet, CategoryDetailsViewSet, SubCategoryDetailsViewSet
+from .views import GroupViewSet, SubjectViewSet, CategoryViewSet, SubCategoryViewSet, QuestionViewSet, BulkQuestionUploadView, SubjectDetailViewSet, CategoryDetailsViewSet, SubCategoryDetailsViewSet, Home_Dashboard
 from django.urls import path , include
 
 urlpatterns = [
@@ -20,5 +20,8 @@ urlpatterns = [
     # question views
     path('questions/', QuestionViewSet.as_view(), name='question-list'),
     path('upload-questions/', BulkQuestionUploadView.as_view(), name='question_upload'),
+
+    # Dashboard
+    path('dashboard/', Home_Dashboard.as_view(), name='dashboard-view'),
     
 ]
