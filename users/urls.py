@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ValidateAccessTokenView, GenerateAccessTokenView, List_Of_AccessTokens, UpdateAccessTokenView, DeleteAccessTokenView, UserViewSet
+from .views import ValidateAccessTokenView, GenerateAccessTokenView, List_Of_AccessTokens, UpdateAccessTokenView, DeleteAccessTokenView, UserViewSet, CurrentUserView
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 
@@ -15,5 +15,6 @@ urlpatterns = [
     path('token-update/', UpdateAccessTokenView.as_view(), name='update-token'),
     path('token-delete/', DeleteAccessTokenView.as_view(), name='delete-token'),
     path('', include(router.urls)),
+    path('current-user/', CurrentUserView.as_view(), name='current-user'),
     
 ]
