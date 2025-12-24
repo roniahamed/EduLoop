@@ -13,6 +13,7 @@ from django.core.cache import cache
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django.db import transaction
+from rest_framework.permissions import IsAdminUser
 
 # from rest_framework.permissions import IsAuthenticatedOrReadOnly
 # from users.authentication import TokenAuthentication, AuthenticatedStudent
@@ -343,7 +344,34 @@ class BulkQuestionUploadView(APIView):
 
 
 
-        
-        
+# Dashboard 
+
+from users.models import AccessToken
+from django.contrib.auth.models import User
+
+class Home_Dashboard(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, *args, **kwargs):
+        total_groups = Group.objects.count()
+        total_subjects = Subject.objects.count()
+        total_categories = Category.objects.count()
+        total_subcategories = SubCategory.objects.count()
+        total_questions = Question.objects.count()
+        total_token = AccessToken.objects.count()
+        total_users = User.objects.count()
+
+        data = {
+            "total_groups": total_groups,
+            "total_subjects": total_subjects,
+            "total_categories": total_categories,
+            "total_subcategories": total_subcategories,
+            "total_questions": total_questions,
+            "total_access_tokens": total_token,
+            "total_users": total_users,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
 
 
