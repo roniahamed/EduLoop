@@ -96,3 +96,10 @@ class CurrentUserView(APIView):
         user.delete()
         return Response({"message": "Benutzerkonto erfolgreich gelöscht."}, status=status.HTTP_200_OK)
     
+    def patch(self, request, *args, **kwargs):
+        user = request.user 
+        serializer = UserSerializer(user, data = request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
