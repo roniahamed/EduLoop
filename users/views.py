@@ -30,9 +30,16 @@ class GenerateAccessTokenView(APIView):
     permission_classes = [IsAdminUser]  
 
     def post(self, request, *args, **kwargs):
-        token = AccessToken.objects.create()
+        key = request.data.get('key', None)
+        token = None
+        if key:
+            if AccessToken.objects.filter(key=key).exists():
+                return Response({"error": "Ein Token mit diesem Schlüssel existiert bereits."}, status=status.HTTP_400_BAD_REQUEST)
+            token = AccessToken.objects.create(key=key)
+        else:
+            token = AccessToken.objects.create()
         return Response({"key": token.key}, status=status.HTTP_201_CREATED)
-
+    
 class List_Of_AccessTokens(ListAPIView):
     permission_classes = [IsAdminUser]  
     serializer_class = AccessTokenSerializer
