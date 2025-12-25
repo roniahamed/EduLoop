@@ -405,7 +405,7 @@ class Question_Dashboard(ListAPIView):
     serializer_class = QuestionListSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     ordering_fields = ['created_at', 'group__name', 'subject__name', 'category__name', 'subcategory__name']
-    search_fields = ['group__name', 'subject__name', 'category__name', 'subcategory__name']
+    search_fields = ['group__name', 'subject__name', 'category__name', 'subcategory__name', 'metadata', 'type', 'level', 'id']
     filterset_fields = ['level', 'type', 'group__id', 'subject__id', 'category__id', 'subcategory__id']
 
     def get_queryset(self):
