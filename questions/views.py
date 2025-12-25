@@ -63,6 +63,10 @@ class SubjectViewSet(ListCreateAPIView):
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'group__name']
+    ordering_fields = ['name', 'group__name']
+    filterset_fields = ['group__id']
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data, many = isinstance(request.data, list))
@@ -391,3 +395,4 @@ class Question_Dashboard(ListAPIView):
     def get_queryset(self):
         questions = Question.objects.select_related('group', 'subject', 'category', 'subcategory').all().order_by('-created_at')
         return questions
+    
