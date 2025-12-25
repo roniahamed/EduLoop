@@ -6,8 +6,11 @@ from .models import AccessToken
 from rest_framework.permissions import IsAdminUser
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
-from .serializers import UserSerializer
+from .serializers import UserSerializer, AccessTokenSerializer
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.generics import ListAPIView
+from questions.views import StandardResultsSetPagination
+
 
 
 class ValidateAccessTokenView(APIView):
@@ -30,14 +33,14 @@ class GenerateAccessTokenView(APIView):
         token = AccessToken.objects.create()
         return Response({"key": token.key}, status=status.HTTP_201_CREATED)
 
-class List_Of_AccessTokens(APIView):
+class List_Of_AccessTokens(ListAPIView):
     permission_classes = [IsAdminUser]  
+    serializer_class = AccessTokenSerializer
+    pagination_class = StandardResultsSetPagination
 
-    def get(self, request, *args, **kwargs):
+    def get_queryset(self):
         tokens = AccessToken.objects.all()
-        token_list = [{"key": token.key, "description": token.description, "is_active": token.is_active, "created_at": token.created_at} for token in tokens]
-        return Response(token_list, status=status.HTTP_200_OK)
-    
+        return tokens
 class UpdateAccessTokenView(APIView):
     permission_classes = [IsAdminUser]  
 
