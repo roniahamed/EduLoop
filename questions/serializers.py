@@ -157,7 +157,8 @@ class QuestionWriteSerializer(serializers.ModelSerializer):
     subcategory = serializers.CharField(allow_null=True, required=False, allow_blank=True)
     class Meta:
         model = Question
-        fields = ['group', 'subject', 'category', 'subcategory', 'level', 'type', 'metadata']
+        fields = ['id','group', 'subject', 'category', 'subcategory', 'level', 'type', 'metadata']
+        read_only_fields = ['id']
     
     def validate(self, attrs):
         group_instance = attrs.get('group')
@@ -221,6 +222,7 @@ class QuestionDetailSerializer(serializers.ModelSerializer):
         read_only_fields = fields
         
 
+#question list serializer
 class QuestionListSerializer(serializers.ModelSerializer):
     group = serializers.SlugRelatedField(slug_field='name',read_only=True )
     subject = serializers.SlugRelatedField(slug_field='name',read_only=True)
