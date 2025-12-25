@@ -99,6 +99,10 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAdminUser]
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    filterset_fields = ['is_active', 'is_staff', 'date_joined']
+    search_fields = ['username', 'email', 'first_name', 'last_name']
+    ordering_fields = ['date_joined', 'username']
 
 class CurrentUserView(APIView):
     permission_classes = [IsAuthenticated]
@@ -114,6 +118,10 @@ class CurrentUserView(APIView):
     
     def patch(self, request, *args, **kwargs):
         user = request.user 
+        if 'is_staff' in request.data and request.data['is_staff'] != user.is_staff:
+            return Response({"error": "Sie können das 'is_staff'-Feld nicht ändern."}, status=status.HTTP_403_FORBIDDEN)
+        if 'is_active' in request.data and request.data['is_active'] != user.is_active :
+            return Response({"error": "Sie können das 'is_active'-Feld nicht ändern."}, status=status.HTTP_403_FORBIDDEN)
         serializer = UserSerializer(user, data = request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
