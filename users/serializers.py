@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from .models import AccessToken
+from rest_framework.serializers import ModelSerializer
 
 
 
@@ -46,3 +48,8 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
+
+class AccessTokenSerializer(ModelSerializer):
+    class Meta:
+        model = AccessToken
+        fields = ['key', 'description', 'is_active', 'created_at']
