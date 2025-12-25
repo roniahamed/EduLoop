@@ -1,4 +1,4 @@
-from .views import GroupViewSet, SubjectViewSet, CategoryViewSet, SubCategoryViewSet, QuestionViewSet, BulkQuestionUploadView, SubjectDetailViewSet, CategoryDetailsViewSet, SubCategoryDetailsViewSet, Home_Dashboard, Question_Dashboard
+from .views import GroupViewSet, SubjectViewSet, CategoryViewSet, SubCategoryViewSet, QuestionViewSet, BulkQuestionUploadView, SubjectDetailViewSet, CategoryDetailsViewSet, SubCategoryDetailsViewSet, Home_Dashboard, Question_Dashboard, CategoryListViewSet
 from django.urls import path , include
 
 urlpatterns = [
@@ -10,6 +10,7 @@ urlpatterns = [
 
         # category views
     path('categories/', CategoryViewSet.as_view(), name='category-list-all'),
+    path('categories/list/', CategoryListViewSet.as_view(), name='category-list'),
 
     path('categories/<int:subject_id>/', CategoryDetailsViewSet.as_view(), name='category-detail-view'),
 
