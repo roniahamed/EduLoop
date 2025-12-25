@@ -10,6 +10,8 @@ from .serializers import UserSerializer, AccessTokenSerializer
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import ListAPIView
 from questions.views import StandardResultsSetPagination
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter, SearchFilter
 
 
 
@@ -44,6 +46,10 @@ class List_Of_AccessTokens(ListAPIView):
     permission_classes = [IsAdminUser]  
     serializer_class = AccessTokenSerializer
     pagination_class = StandardResultsSetPagination
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    filterset_fields = ['is_active', 'created_at']
+    search_fields = ['key', 'description']
+    ordering_fields = ['created_at', 'key']
 
     def get_queryset(self):
         tokens = AccessToken.objects.all()
