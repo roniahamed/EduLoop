@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.generics import ListAPIView, ListCreateAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.views import APIView
 from .permissions import IsAdminOrReadOnly
 from django.contrib.sessions.backends.db import SessionStore
@@ -412,12 +412,23 @@ class Question_Dashboard(ListAPIView):
         questions = Question.objects.select_related('group', 'subject', 'category', 'subcategory').all().order_by('-created_at')
         return questions
 
-class QuestionDetail_Dashboard(APIView):
-    permission_classes = [IsAdminUser]
 
-    def get(self, request, *args, **kwargs):
-        question_id = kwargs.get('question_id')
-        question = get_object_or_404(Question.objects.select_related('group', 'subject', 'category', 'subcategory'), id=question_id)
-        serializer = QuestionDetailSerializer(question)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+# Question Detail Dashboard View
+# Question get and patch view for admin and delete view
+
+
+from .serializers import QuestionWriteSerializer
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
+class QuestionDetail_Dashboard(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminUser]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
+    queryset = Question.objects.select_related('group', 'subject', 'category', 'subcategory').all()
+    def get_serializer_class(self):
+        if self.request.method in ['PUT', 'PATCH']:
+            return QuestionWriteSerializer
+        return QuestionDetailSerializer
+    
+    lockup_field = 'id'
+    lookup_url_kwarg = 'question_id'
+    
     
