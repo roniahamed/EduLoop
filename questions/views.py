@@ -411,4 +411,13 @@ class Question_Dashboard(ListAPIView):
     def get_queryset(self):
         questions = Question.objects.select_related('group', 'subject', 'category', 'subcategory').all().order_by('-created_at')
         return questions
+
+class QuestionDetail_Dashboard(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, *args, **kwargs):
+        question_id = kwargs.get('question_id')
+        question = get_object_or_404(Question.objects.select_related('group', 'subject', 'category', 'subcategory'), id=question_id)
+        serializer = QuestionDetailSerializer(question)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
