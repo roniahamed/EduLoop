@@ -430,5 +430,17 @@ class QuestionDetail_Dashboard(RetrieveUpdateDestroyAPIView):
     
     lockup_field = 'id'
     lookup_url_kwarg = 'question_id'
+
+
+class QuestionWriteViews(APIView):
+    permission_classes = [IsAdminUser]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
+
+    def post(self, request, *args, **kwargs):
+        serializer = QuestionWriteSerializer(data = request.data)
+        serializer.is_valid(raise_exception=True)
+        question = serializer.save()
+        read_serializer = QuestionDetailSerializer(question)
+        return Response(read_serializer.data, status=status.HTTP_201_CREATED)
     
     
