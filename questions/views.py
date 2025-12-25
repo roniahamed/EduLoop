@@ -1,5 +1,5 @@
 from .models import Group, Subject, Category, SubCategory, Question
-from .serializers import GroupSerializer, SubjectSerializer, CategoryWriteSerializer,CategoryReadSerializer, SubCategoryReadSerializer, SubCategoryWriteSerializer, QuestionDetailSerializer, QuestionListSerializer
+from .serializers import GroupSerializer, SubjectSerializer, CategoryWriteSerializer,CategoryReadSerializer, SubCategoryReadSerializer, SubCategoryWriteSerializer, QuestionDetailSerializer, QuestionListSerializer, CategoryListSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
@@ -121,6 +121,15 @@ class CategoryDetailsViewSet(ListAPIView):
         subject_id = self.kwargs.get('subject_id')
         subject = get_object_or_404(Subject, id=subject_id)
         return Category.objects.select_related('subject','group').prefetch_related('subcategories').filter(subject=subject).order_by('name')
+    
+class CategoryListViewSet(ListAPIView):
+    serializer_class = CategoryListSerializer
+    pagination_class = StandardResultsSetPagination
+    permission_classes = [IsAdminOrReadOnly]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
+
+    def get_queryset(self):
+        return Category.objects.select_related('subject','group').all().order_by('name')
 
 #  SubCategory 
 
