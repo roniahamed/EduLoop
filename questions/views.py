@@ -94,7 +94,10 @@ class CategoryViewSet(ListCreateAPIView):
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
-
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'subject__name', 'group__name']
+    ordering_fields = ['name', 'subject__name', 'group__name']
+    filterset_fields = ['subject__id', 'group__id']
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return CategoryWriteSerializer
@@ -125,6 +128,10 @@ class SubCategoryViewSet(ListCreateAPIView):
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'category__name', 'subject__name', 'group__name']
+    ordering_fields = ['name', 'category__name', 'subject__name', 'group__name']
+    filterset_fields = ['category__id', 'subject__id', 'group__id']
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return SubCategoryWriteSerializer
