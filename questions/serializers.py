@@ -52,6 +52,16 @@ class SubCategoryReadSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'name', 'category','subject', 'group']
 
 # Category Serializer
+
+# list categories serializer
+class CategoryListSerializer(serializers.ModelSerializer):
+    subject = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    group = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'subject','group', 'created_at']
+        read_only_fields = ['id', 'created_at', 'name', 'subject', 'group']
+
 # Category Read Serializers 
 class CategoryReadSerializer(serializers.ModelSerializer):
     subcategories = SubCategoryReadSerializer(many=True, read_only = True)
@@ -212,6 +222,10 @@ class QuestionDetailSerializer(serializers.ModelSerializer):
         
 
 class QuestionListSerializer(serializers.ModelSerializer):
+    group = serializers.SlugRelatedField(slug_field='name',read_only=True )
+    subject = serializers.SlugRelatedField(slug_field='name',read_only=True)
+    category = serializers.SlugRelatedField(slug_field='name' ,read_only=True)
+    subcategory = serializers.SlugRelatedField(slug_field='name', read_only=True)
     class Meta:
         model = Question
         fields = ['id', 'group', 'subject', 'category', 'subcategory', 'level', 'type', 'created_at']
