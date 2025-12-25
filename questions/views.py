@@ -14,6 +14,8 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django.db import transaction
 from rest_framework.permissions import IsAdminUser
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 # from rest_framework.permissions import IsAuthenticatedOrReadOnly
 # from users.authentication import TokenAuthentication, AuthenticatedStudent
@@ -374,14 +376,18 @@ class Home_Dashboard(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-class Question_Dashboard(APIView):
+
+from rest_framework.generics import ListAPIView
+
+class Question_Dashboard(ListAPIView):
     permission_classes = [IsAdminUser]
-    filter_backends = []
+    pagination_class = StandardResultsSetPagination
+    serializer_class = QuestionListSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     ordering_fields = ['created_at', 'group__name', 'subject__name', 'category__name', 'subcategory__name']
     search_fields = ['group__name', 'subject__name', 'category__name', 'subcategory__name']
     filterset_fields = ['level', 'type', 'group__id', 'subject__id', 'category__id', 'subcategory__id']
 
-    def get(self, request, *args, **kwargs):
-        questions = Question.objects.select_related('group', 'subject', 'category', 'subcategory').all().order_by('-created_at')[:10]
-        serializer = QuestionListSerializer(questions, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get_queryset(self):
+        questions = Question.objects.select_related('group', 'subject', 'category', 'subcategory').all().order_by('-created_at')
+        return questions
