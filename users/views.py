@@ -109,6 +109,10 @@ class UserViewSet(ModelViewSet):
     def perform_update(self, serializer):
         target_user = self.get_object()
         request_user = self.request.user 
+        if target_user == request_user and 'is_staff' in self.request.data and self.request.data['is_staff'] != target_user.is_staff:
+            raise PermissionDenied("Sie können Ihr eigenes 'is_staff'-Feld nicht ändern.")
+        if target_user == request_user and 'is_active' in self.request.data and self.request.data['is_active'] != target_user.is_active:
+            raise PermissionDenied("Sie können Ihr eigenes 'is_active'-Feld nicht ändern.")
         if target_user.is_superuser and not request_user.is_superuser:
             raise PermissionDenied("Sie haben keine Berechtigung, einen Superuser zu ändern.")
         serializer.save()
