@@ -95,6 +95,8 @@ class DeleteAccessTokenView(APIView):
             return Response({"error": "Token nicht gefunden."}, status=status.HTTP_404_NOT_FOUND)
 
 # User  
+
+from rest_framework.exceptions import PermissionDenied
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -103,6 +105,16 @@ class UserViewSet(ModelViewSet):
     filterset_fields = ['is_active', 'is_staff', 'date_joined']
     search_fields = ['username', 'email', 'first_name', 'last_name']
     ordering_fields = ['date_joined', 'username']
+
+    def perform_update(self, serializer):
+        target_user = self.get_object()
+        request_user = self.request.user 
+        if target_user.is_superuser and not request_user.is_superuser:
+            raise PermissionDenied("Sie haben keine Berechtigung, einen Superuser zu ändern.")
+        serializer.save()
+
+
+
 
 class CurrentUserView(APIView):
     permission_classes = [IsAuthenticated]
