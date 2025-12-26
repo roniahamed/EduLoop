@@ -127,6 +127,10 @@ class CategoryListViewSet(ListAPIView):
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdminOrReadOnly]
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'subject__name', 'group__name']
+    ordering_fields = ['name', 'subject__name', 'group__name']
+    filterset_fields = ['subject__id', 'group__id']
 
     def get_queryset(self):
         return Category.objects.select_related('subject','group').all().order_by('name')
