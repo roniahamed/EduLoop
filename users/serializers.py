@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
         password = data.get('password', None)
         confirm_password = data.get('confirm_password', None)
 
-        if self.instance is None or 'password' in data:
+        if self.instance is None or 'password' in data or 'confirm_password' in data:
 
 
         
