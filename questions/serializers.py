@@ -230,6 +230,6 @@ class QuestionListSerializer(serializers.ModelSerializer):
     subcategory = serializers.SlugRelatedField(slug_field='name', read_only=True)
     class Meta:
         model = Question
-        fields = ['id', 'group', 'subject', 'category', 'subcategory', 'level', 'type', 'created_at']
+        fields = ['id', 'group', 'subject', 'category', 'subcategory', 'level', 'type', 'created_at', 'metadata', 'updated_at']
         read_only_fields = fields
     
