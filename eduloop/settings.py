@@ -216,7 +216,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://extrahanden.ai",
     "http://extrahanden.ai",
     "https://www.extrahanden.ai",
-    "http://localhost:6868"
+    "http://localhost:6868",
+    "https://eduloop-samir-frontend.vercel.app",
 
 ]
 
@@ -233,7 +234,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://extrahanden.ai",
     "https://www.extrahanden.ai",
     "http://extrahanden.ai",
-    "http://localhost:6868"
+    "http://localhost:6868",
 ]
 
 USE_X_FORWARDED_HOST = True
