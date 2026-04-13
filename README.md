@@ -1,6 +1,9 @@
-# EduLoop — Quiz & Question Bank API
+# EduLoop — Intelligent Quiz & Question Bank Platform
 
-A Django REST Framework-powered backend API for managing structured educational question banks, supporting session-based quiz delivery, hierarchical content organization, and access-controlled administration.
+EduLoop is a powerful, easy-to-use backend API that helps educational institutions, coaching centers, and content creators build and deliver smart, structured, and personalized quizzes at scale.
+It organizes your entire question bank with a clean hierarchical system — Groups → Subjects → Categories → Subcategories — making content management intuitive and scalable. Students enjoy a smooth, session-based quiz experience with smart question rotation, seen-question tracking, and flexible support for all major question types (MCQ, True/False, Fill-in-the-Blank, Math, Writing, and more).
+Whether you're running daily practice tests, mock exams, or adaptive learning sessions, EduLoop simplifies question bank management, enables bulk uploads with error reporting, and provides secure, token-based access for students — all while giving admins full control and insightful dashboard statistics.
+Built for performance and reliability, EduLoop helps you focus on creating great educational content while delivering a seamless and engaging quiz experience to your learners.
 
 ## Live Demo
 
@@ -304,13 +307,6 @@ docker compose exec app python manage.py migrate
 docker compose exec app python manage.py createsuperuser
 ```
 
-### Render / Railway
-
-1. Connect your repository to the platform.
-2. Set all environment variables (from the Environment Variables section) in the platform's dashboard.
-3. Set the build command to: `pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate`
-4. Set the start command to: `gunicorn --config gunicorn.conf.py eduloop.wsgi:application`
-
 ### Production Checklist
 
 - Set `DEBUG=False` in `.env`.
@@ -321,17 +317,7 @@ docker compose exec app python manage.py createsuperuser
 - Use HTTPS with valid TLS certificates (handled by Nginx or a load balancer).
 - Enable `SECURE_PROXY_SSL_HEADER` if terminating SSL at a proxy layer.
 
-## Contributing
 
-Contributions are welcome. Please follow these steps:
-
-1. Fork the repository.
-2. Create a feature branch: `git checkout -b feature/your-feature-name`
-3. Commit your changes with a clear message: `git commit -m "feat: describe your change"`
-4. Push to your fork: `git push origin feature/your-feature-name`
-5. Open a Pull Request against the `main` branch with a description of the changes.
-
-Please ensure that your code follows PEP 8 style guidelines, includes docstrings for new views or complex logic, and does not break existing tests.
 
 ## License
 
