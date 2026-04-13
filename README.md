@@ -1,442 +1,357 @@
-# 🎓 EduLoop - Educational Content Management Platform
+# EduLoop — Quiz & Question Bank API
 
-<div align="center">
+A Django REST Framework-powered backend API for managing structured educational question banks, supporting session-based quiz delivery, hierarchical content organization, and access-controlled administration.
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/roniahamed/eduloop)
-[![Performance](https://img.shields.io/badge/performance-A+-green.svg)](./COMPREHENSIVE_API_ANALYSIS_REPORT.md)
-[![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](./COMPREHENSIVE_API_ANALYSIS_REPORT.md)
-[![Documentation](https://img.shields.io/badge/docs-95%25-brightgreen.svg)](./Documentations/)
-[![Django](https://img.shields.io/badge/django-5.2.5-blue.svg)](https://djangoproject.com/)
-[![License](https://img.shields.io/badge/license-Proprietary-red.svg)](#-license)
+## Live Demo
 
-**High-Performance RESTful API for Educational Content**
+[Live API](https://extrahanden.ai)
 
-*Enterprise-grade • Production-ready • Developer-friendly*
 
-[📚 Documentation](./Documentations/) • [🚀 Quick Start](#-quick-start) • [📊 Performance](./COMPREHENSIVE_API_ANALYSIS_REPORT.md)
+## Features
 
-</div>
+- Hierarchical content taxonomy: Groups, Subjects, Categories, SubCategories, and Questions
+- Session-based quiz engine with stateful question delivery, seen-question tracking, and batch rotation
+- `JSONField`-based flexible question metadata supporting multiple question types (MCQ, fill-in-the-blank, true/false, math, writing, etc.)
+- Bulk question upload via a single API call with detailed per-row error reporting
+- Custom access token authentication (`AccessKey` header scheme) for student-facing endpoints
+- DRF `TokenAuthentication` and `SessionAuthentication` support for admin and staff users
+- Admin dashboard API exposing aggregate statistics (groups, subjects, categories, questions, tokens, users)
+- Full CRUD management for questions via admin-only endpoints with partial update support
+- Redis-backed response caching for frequently queried data (e.g., group listings cached for 15 minutes)
+- Rate limiting: 200 requests/minute (anonymous), 500 requests/minute (authenticated)
+- GZip response compression middleware for optimized payload sizes
+- CORS policy with trusted-origin allowlist and credential support
+- Unfold-powered Django admin interface with a clean, modern UI
+- Dockerized deployment with multi-stage builds, Gunicorn, and Nginx reverse proxy
+- Comprehensive database indexing strategy, including composite and partial indexes, for high-throughput query performance
 
----
+## Tech Stack
 
-## 📋 Table of Contents
-- [🎯 Overview](#-overview)
-- [✨ Key Features](#-key-features)
-- [⚡ Performance](#-performance)
-- [🚀 Quick Start](#-quick-start)
-- [💻 Tech Stack](#-tech-stack)
-- [📦 Installation](#-installation)
-- [📚 Documentation](#-documentation)
-- [🏗️ Project Structure](#️-project-structure)
-- [🛡️ Security](#️-security)
-- [🚀 Deployment](#-deployment)
-- [👨‍💻 Author](#-author)
-- [📄 License](#-license)
+[![Django](https://img.shields.io/badge/Django-5.2.5-092E20?style=flat&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![Django REST Framework](https://img.shields.io/badge/DRF-3.16.1-000000?style=flat&logo=django&logoColor=white)](https://www.django-rest-framework.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-6.4.0-DC382D?style=flat&logo=redis&logoColor=white)](https://redis.io/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+[![Gunicorn](https://img.shields.io/badge/Gunicorn-23.0.0-499848?style=flat&logo=gunicorn&logoColor=white)](https://gunicorn.org/)
+[![Nginx](https://img.shields.io/badge/Nginx-1.23-009639?style=flat&logo=nginx&logoColor=white)](https://nginx.org/)
 
----
+| Layer | Technology |
+|---|---|
+| Framework | Django 5.2.5 + Django REST Framework 3.16.1 |
+| Database | PostgreSQL 15 (via `psycopg2-binary`) |
+| Cache | Redis 6.x (via `django-redis`) |
+| Authentication | Custom `AccessKey` token auth + DRF `TokenAuthentication` + `SessionAuthentication` |
+| Admin Interface | `django-unfold` |
+| Filtering | `django-filter` with `SearchFilter` and `OrderingFilter` |
+| Static Files | WhiteNoise |
+| Web Server | Gunicorn (3 workers) behind Nginx |
+| Containerization | Docker (multi-stage build) + Docker Compose |
+| Configuration | `python-decouple` (`.env` based) |
 
-## 🎯 Overview
+## Prerequisites
 
-**EduLoop** is a high-performance RESTful API platform for managing educational content. Built with Django and optimized for speed, scalability, and security, it provides a robust foundation for educational applications, quiz systems, and learning management platforms.
+| Software | Minimum Version |
+|---|---|
+| Python | 3.11 |
+| PostgreSQL | 15 |
+| Redis | 6.x |
+| Docker | 24.x (optional, for containerized setup) |
+| Docker Compose | 2.x (optional) |
+| pip | 23+ |
 
-### 🌟 Why EduLoop?
+## Installation and Setup
 
-- **⚡ Lightning Fast** - 12.3ms average response time
-- **📈 Highly Scalable** - Handles 9,560+ concurrent users
-- **🔒 Enterprise Security** - 100% security score
-- **📚 Well-Documented** - 95% documentation quality
-- **🎯 Developer-Friendly** - Complete API docs & playground
-- **🚀 Production-Ready** - Battle-tested under load
-
-### 📊 Content Organization
-
-EduLoop organizes educational content in a flexible 4-level hierarchy:
-
-```
-Groups → Subjects → Categories → Subcategories → Questions
-```
-
-**Example:**
-```
-Mathematics (Group)
-  └── Algebra (Subject)
-      └── Linear Equations (Category)
-          └── Basic Equations (Subcategory)
-              └── "Solve for x: 2x + 5 = 15" (Question)
-```
-
----
-
-## ✨ Key Features
-
-### 🎯 Core Capabilities
-- **Hierarchical Organization** - 4-level content structure
-- **Smart Question Sessions** - Randomized question delivery
-- **Bulk Operations** - Efficient batch processing
-- **Advanced Filtering** - Multi-level content filtering
-- **Token Authentication** - Secure 8-digit token system
-
-### ⚡ Performance
-- **Sub-20ms Response** - Most endpoints under 20ms
-- **High Concurrency** - 9,560+ simultaneous users
-- **GZip Compression** - 60-80% size reduction
-
-### 🛡️ Security
-- **SQL Injection Protection** - 100% secure
-- **XSS Protection** - Comprehensive validation
-- **Rate Limiting** - 200/min anon, 500/min auth
-- **CSRF Protection** - Built-in Django security
-
-### 🎨 Developer Experience
-- **Modern Admin Interface** - Django Unfold
-- **Interactive Playground** - Browser-based testing
-- **Comprehensive Docs** - 95% quality score
-- **Multi-language Examples** - Python, JavaScript, cURL
-
----
-
-## ⚡ Performance
-
-### Key Metrics
-
-| Metric | Value | Grade |
-|--------|-------|-------|
-| **Avg Response Time** | 12.3ms | **A+** |
-| **Success Rate** | 96.2% (10K users) | **A+** |
-| **Concurrent Users** | 9,560 tested | **A+** |
-| **Security Score** | 100% | **A+** |
-| **Documentation** | 95% | **A+** |
-
-### Endpoint Performance
-
-| Endpoint | Response Time | Grade |
-|----------|---------------|-------|
-| Token Validation | 1.8ms | ⭐ A+ |
-| Subjects List | 3.7ms | ⭐ A+ |
-| Groups List | 13.4ms | A+ |
-| Categories List | 73.9ms | A |
-
-**📊 For detailed performance analysis:** [View Full Report](./COMPREHENSIVE_API_ANALYSIS_REPORT.md)
-
----
-
-## 🚀 Quick Start
-
-### 1️⃣ Test the API (30 seconds)
+### 1. Clone the Repository
 
 ```bash
-# Validate your token
-curl -X POST http://localhost:8000/api/token-verify/ \
-  -H "Content-Type: application/json" \
-  -d '{"key": "12345678"}'
-
-# Get all groups
-curl -X GET http://localhost:8000/api/groups/ \
-  -H "Authorization: Token 12345678"
-
-# Start a quiz session
-curl -X POST http://localhost:8000/api/questions/ \
-  -H "Authorization: Token 12345678" \
-  -H "Content-Type: application/json" \
-  -d '{"group_id": 1, "subject_id": 1, "levels": ["easy"]}'
-```
-
-### 2️⃣ Try the Interactive Playground
-
-Open `Documentations/api-playground.html` in your browser for a complete testing environment with live performance monitoring.
-
-### 3️⃣ Read the Documentation
-
-- **📚 Complete API Reference:** [Documentations/api.md](./Documentations/api.md)
-- **🎓 Developer Guide:** [Documentations/DEVELOPER_ONBOARDING_GUIDE.md](./Documentations/DEVELOPER_ONBOARDING_GUIDE.md)
-- **📊 Performance Report:** [COMPREHENSIVE_API_ANALYSIS_REPORT.md](./COMPREHENSIVE_API_ANALYSIS_REPORT.md)
-
----
-
-## 💻 Tech Stack
-
-- **Backend:** Django 5.2.5, Django REST Framework 3.16+
-- **Database:** PostgreSQL
-- **Server:** Gunicorn + Nginx
-- **Authentication:** Token-based (8-digit custom tokens)
-- **Admin:** Django Unfold (Modern UI)
-- **Security:** Rate limiting, CSRF, XSS protection
-- **Deployment:** Docker + Docker Compose
-
-**📚 For detailed API documentation and examples:** [Documentations/api.md](./Documentations/api.md)
-
----
-
-## 📦 Installation
-
-### Option 1: Docker (Recommended)
-
-```bash
-# Clone repository
-git clone https://github.com/roniahamed/EduLoop
+git clone https://github.com/roniahamed/eduloop.git
 cd eduloop
-
-# Configure environment
-cp .env.example .env
-nano .env  # Edit with your settings
-
-# Build and run
-docker-compose up --build
-
-# Run migrations
-docker-compose exec web python manage.py migrate
-
-# Create superuser
-docker-compose exec web python manage.py createsuperuser
 ```
 
-**Access:**
-- API: http://localhost:80
-- Admin: http://localhost:80/admin/
-
-### Option 2: Local Development
+### 2. Create and Activate a Virtual Environment
 
 ```bash
-# Clone and setup
-git clone https://github.com/roniahamed/EduLoop
-cd eduloop
-
-# Create virtual environment
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate
+```
 
-# Install dependencies
+### 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-# Configure .env file
+### 4. Configure Environment Variables
+
+Copy the example environment file and fill in your values:
+
+```bash
 cp .env.example .env
-nano .env
+```
 
-# Run migrations
+Edit `.env` with your credentials (see [Environment Variables](#environment-variables) section).
+
+### 5. Apply Database Migrations
+
+```bash
 python manage.py migrate
+```
 
-# Create superuser
+### 6. Create a Superuser
+
+```bash
 python manage.py createsuperuser
+```
 
-# Start server
+### 7. Collect Static Files
+
+```bash
+python manage.py collectstatic --no-input
+```
+
+## Environment Variables
+
+| Variable | Description |
+|---|---|
+| `SECRET_KEY` | Django secret key. Use a long, random string in production. |
+| `DEBUG` | Set to `False` in production. |
+| `ALLOWED_HOSTS` | Comma-separated list of allowed hostnames (e.g., `localhost,127.0.0.1,yourdomain.com`). |
+| `POSTGRES_DB` | PostgreSQL database name. |
+| `POSTGRES_USER` | PostgreSQL username. |
+| `POSTGRES_PASSWORD` | PostgreSQL password. |
+| `DB_PORT` | PostgreSQL port (default: `5432`). |
+
+> Note: The `.env.example` file in the repository root provides a complete template.
+
+## Running the Project
+
+### Local Development
+
+```bash
 python manage.py runserver
 ```
 
-**Access:**
-- API: http://localhost:8000
-- Admin: http://localhost:8000/admin/
+The API will be available at `http://127.0.0.1:8000/`.
 
-### Environment Variables
+### With Gunicorn (Production-like)
 
-```env
-SECRET_KEY=your-secret-key
-DEBUG=False
-ALLOWED_HOSTS=localhost,127.0.0.1
-
-DB_NAME=eduloop_db
-DB_USER=eduloop_user
-DB_PASSWORD=secure_password
-DB_HOST=db  # or 127.0.0.1 for local
-DB_PORT=5432
+```bash
+gunicorn --config gunicorn.conf.py eduloop.wsgi:application
 ```
 
----
+### With Docker Compose
 
-## 📚 Documentation
+```bash
+# Build and start all services (app, PostgreSQL, Nginx)
+docker compose up --build
 
-EduLoop provides **comprehensive documentation** with a **95% quality score**.
+# Run in detached mode
+docker compose up -d --build
 
-### 📖 Available Documentation
+# Apply migrations inside the running container
+docker compose exec app python manage.py migrate
 
-| Document | Description | Audience |
-|----------|-------------|----------|
-| **[📚 API Reference](./Documentations/api.md)** | Complete API documentation with examples | Developers |
-| **[🎓 Developer Guide](./Documentations/DEVELOPER_ONBOARDING_GUIDE.md)** | Step-by-step tutorial (30 min) | New developers |
-| **[🔧 OpenAPI Spec](./Documentations/openapi.yaml)** | Machine-readable API specification | Integration teams |
-| **[🎮 API Playground](./Documentations/api-playground.html)** | Interactive browser-based testing | All developers |
-| **[📊 Performance Report](./COMPREHENSIVE_API_ANALYSIS_REPORT.md)** | Detailed analysis & benchmarks | Technical leads |
+# Create superuser inside the running container
+docker compose exec app python manage.py createsuperuser
+```
 
-### 🚀 Quick Links
+The application will be accessible through Nginx on port `8091` (mapped to container port `80`).
 
-- **New to EduLoop?** → [Developer Onboarding Guide](./Documentations/DEVELOPER_ONBOARDING_GUIDE.md)
-- **Need API details?** → [Complete API Reference](./Documentations/api.md)
-- **Want to test?** → [Interactive Playground](./Documentations/api-playground.html)
-- **Building integration?** → [OpenAPI Specification](./Documentations/openapi.yaml)
+## API Endpoints
 
----
+### Authentication
 
-## 🏗️ Project Structure
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/api/api-token-auth/` | Obtain a DRF auth token (username + password) | Public |
+| `POST` | `/api/token-verify/` | Validate a student AccessKey token | Public |
+| `POST` | `/api/token-generate/` | Generate a new student AccessKey token | Admin |
+| `GET` | `/api/token-list/` | List all AccessKey tokens | Admin |
+| `PUT` | `/api/token-update/` | Update an AccessKey token | Admin |
+| `DELETE` | `/api/token-delete/` | Delete an AccessKey token | Admin |
+
+### Users
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `GET` | `/api/current-user/` | Retrieve the authenticated user's profile | Authenticated |
+| `PATCH` | `/api/current-user/` | Update the authenticated user's profile | Authenticated |
+| `DELETE` | `/api/current-user/` | Delete the authenticated user's account | Authenticated |
+| `GET/POST` | `/api/users/` | List all users / Create a user | Admin |
+| `GET/PUT/PATCH/DELETE` | `/api/users/{id}/` | Retrieve, update, or delete a user | Admin |
+
+### Content Taxonomy
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `GET/POST` | `/api/groups/` | List or create Groups | Admin (write), Public (read) |
+| `GET/POST` | `/api/subjects/` | List or create Subjects | Admin (write), Public (read) |
+| `GET` | `/api/subject/{group_id}/` | List Subjects within a specific Group | Public |
+| `GET/POST` | `/api/categories/` | List or create Categories (with SubCategories) | Admin (write), Public (read) |
+| `GET` | `/api/categories/list/` | List Categories (flat, without SubCategories) | Public |
+| `GET` | `/api/categories/{subject_id}/` | List Categories for a specific Subject | Public |
+| `GET/POST` | `/api/subcategories/` | List or create SubCategories | Admin (write), Public (read) |
+| `GET` | `/api/subcategories/{category_id}/` | List SubCategories for a specific Category | Public |
+
+### Questions
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/api/questions/` | Start a new quiz session and receive the first question | Public |
+| `GET` | `/api/questions/` | Retrieve the next question in the active session | Public |
+| `DELETE` | `/api/questions/` | Reset and clear the active quiz session | Public |
+| `POST` | `/api/upload-questions/` | Bulk upload questions from a JSON array | Admin |
+| `POST` | `/api/question/create/` | Create a single question | Admin |
+
+### Admin Dashboard
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `GET` | `/api/dashboard/` | Overview statistics (totals for all entities) | Admin |
+| `GET` | `/api/dashboard/recent-questions/` | Paginated, searchable, filterable question list | Admin |
+| `GET/PUT/PATCH/DELETE` | `/api/dashboard/question/{question_id}/` | Retrieve, update, or delete a specific question | Admin |
+
+## Project Structure
 
 ```
 eduloop/
-├── 📁 Documentations/          # API documentation (95% quality)
-│   ├── api.md                 # Complete API reference
-│   ├── DEVELOPER_ONBOARDING_GUIDE.md
-│   ├── openapi.yaml           # OpenAPI specification
-│   └── api-playground.html    # Interactive testing
+├── eduloop/                  # Django project configuration
+│   ├── settings.py           # Main settings (DB, auth, cache, CORS, DRF config)
+│   ├── urls.py               # Root URL configuration
+│   ├── wsgi.py               # WSGI entry point
+│   └── asgi.py               # ASGI entry point
 │
-├── 📁 eduloop/                # Django project settings
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
+├── questions/                # Core quiz and content taxonomy app
+│   ├── models.py             # Group, Subject, Category, SubCategory, Question
+│   ├── serializers.py        # Read/write serializers for all content models
+│   ├── views.py              # ViewSets, quiz engine, dashboard, bulk upload
+│   ├── urls.py               # Questions URL routing
+│   ├── permissions.py        # IsAdminOrReadOnly custom permission
+│   ├── middleware.py         # CustomSessionMiddleware
+│   └── admin.py              # Admin registrations
 │
-├── 📁 questions/              # Core question management
-│   ├── models.py             # Data models
-│   ├── views.py              # API views
-│   ├── serializers.py        # DRF serializers
-│   └── urls.py
+├── users/                    # Authentication and user management app
+│   ├── models.py             # AccessToken model (student auth)
+│   ├── authentication.py     # Custom AccessKey TokenAuthentication backend
+│   ├── serializers.py        # UserSerializer, AccessTokenSerializer
+│   ├── views.py              # Token management, UserViewSet, CurrentUserView
+│   └── urls.py               # Users URL routing
 │
-├── 📁 users/                  # Authentication
-│   ├── models.py             # AccessToken model
-│   ├── views.py
-│   └── authentication.py
+├── academy/                  # Academy app (reserved for future use)
+├── teacher/                  # Teacher app (reserved for future use)
+├── ai/                       # AI app (reserved for future use)
 │
-├── 📁 academy/                # Academy management
-├── 📁 ai/                     # AI integration
-├── 📁 teacher/                # Teacher management
+├── nginx/
+│   └── nginx.conf            # Nginx reverse proxy configuration
 │
-├──  docker-compose.yml      # Docker configuration
-├── 📄 Dockerfile
-├── 📄 requirements.txt
-├── 📄 manage.py
-│
-├── 📄 COMPREHENSIVE_API_ANALYSIS_REPORT.md
-└── 📄 README.md
+├── staticfiles/              # Collected static files (auto-generated)
+├── Dockerfile                # Multi-stage Docker build
+├── docker-compose.yml        # Docker Compose (app + PostgreSQL + Nginx)
+├── gunicorn.conf.py          # Gunicorn configuration
+├── requirements.txt          # Python dependencies
+├── manage.py                 # Django management entry point
+└── .env.example              # Environment variable template
 ```
 
-### Data Models
+## Running Tests and Migrations
 
-- **Group** - Top-level category (e.g., Mathematics, Science)
-- **Subject** - Belongs to Group (e.g., Algebra, Physics)
-- **Category** - Belongs to Subject (e.g., Linear Equations)
-- **SubCategory** - Belongs to Category (e.g., Basic Equations)
-- **Question** - Individual quiz items with metadata
-- **AccessToken** - 8-digit authentication tokens
-
----
-
-## ️ Security
-
-### Security Features
-
-| Feature | Status |
-|---------|--------|
-| SQL Injection Protection | ✅ 100% |
-| XSS Protection | ✅ 100% |
-| CSRF Protection | ✅ Enabled |
-| Rate Limiting | ✅ Active |
-| Token Authentication | ✅ Secure |
-| HTTPS Ready | ✅ Yes |
-
-### Security Best Practices
-
-- **Rate Limits:** 200/min (anonymous), 500/min (authenticated)
-- **Token Management:** 8-digit unique tokens, can be deactivated
-- **Input Validation:** All inputs validated against strict schemas
-- **Production:** Always use HTTPS, keep SECRET_KEY secure, set DEBUG=False
-
-### Data Privacy
-
-**Important:** EduLoop does **NOT** collect or store any personal student data.
-
-- ❌ No student accounts
-- ❌ No personal information
-- ❌ No tracking or analytics
-- ✅ GDPR-friendly by design
-
-**📚 For detailed security information:** [Documentations/api.md](./Documentations/api.md#security)
-
----
-
-## 🚀 Deployment
-
-### Docker Commands
+### Run Tests
 
 ```bash
-# Build and start
-docker-compose up --build
+# Run all tests
+python manage.py test
 
-# Background mode
-docker-compose up -d
+# Run tests for a specific app
+python manage.py test questions
+python manage.py test users
 
-# View logs
-docker-compose logs -f web
-
-# Stop services
-docker-compose down
-
-# Execute commands
-docker-compose exec web python manage.py migrate
-docker-compose exec web python manage.py createsuperuser
+# Run with verbosity
+python manage.py test --verbosity=2
 ```
+
+### Database Migrations
+
+```bash
+# Create new migrations after model changes
+python manage.py makemigrations
+
+# Apply all pending migrations
+python manage.py migrate
+
+# Show migration status
+python manage.py showmigrations
+```
+
+## Deployment
+
+### Docker (Recommended)
+
+The project ships with a production-ready Docker Compose setup including PostgreSQL, the Django/Gunicorn application, and an Nginx reverse proxy.
+
+```bash
+# 1. Configure environment
+cp .env.example .env
+# Edit .env with production values (DEBUG=False, strong SECRET_KEY, real DB credentials)
+
+# 2. Build and start services
+docker compose up -d --build
+
+# 3. Run migrations
+docker compose exec app python manage.py migrate
+
+# 4. Create superuser
+docker compose exec app python manage.py createsuperuser
+```
+
+### Render / Railway
+
+1. Connect your repository to the platform.
+2. Set all environment variables (from the Environment Variables section) in the platform's dashboard.
+3. Set the build command to: `pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate`
+4. Set the start command to: `gunicorn --config gunicorn.conf.py eduloop.wsgi:application`
 
 ### Production Checklist
 
-- [ ] Set `DEBUG=False`
-- [ ] Configure `SECRET_KEY`
-- [ ] Set up `ALLOWED_HOSTS`
-- [ ] Configure PostgreSQL
-- [ ] Set up SSL/TLS (HTTPS)
-- [ ] Run: `python manage.py check --deploy`
-- [ ] Collect static files: `python manage.py collectstatic`
+- Set `DEBUG=False` in `.env`.
+- Set a strong, unique `SECRET_KEY`.
+- Restrict `ALLOWED_HOSTS` to your production domain(s).
+- Ensure `CSRF_TRUSTED_ORIGINS` and `CORS_ALLOWED_ORIGINS` include your frontend domain.
+- Configure Redis with a stable hostname/password for production cache.
+- Use HTTPS with valid TLS certificates (handled by Nginx or a load balancer).
+- Enable `SECURE_PROXY_SSL_HEADER` if terminating SSL at a proxy layer.
 
-### Performance Monitoring
+## Contributing
 
-Monitor these metrics in production:
-- **Response Time** - Target <100ms
-- **Success Rate** - Target >99%
-- **Error Rate** - Monitor 4xx/5xx errors
-- **Database Performance** - Query times
+Contributions are welcome. Please follow these steps:
 
----
+1. Fork the repository.
+2. Create a feature branch: `git checkout -b feature/your-feature-name`
+3. Commit your changes with a clear message: `git commit -m "feat: describe your change"`
+4. Push to your fork: `git push origin feature/your-feature-name`
+5. Open a Pull Request against the `main` branch with a description of the changes.
 
-## 👨‍💻 Author
+Please ensure that your code follows PEP 8 style guidelines, includes docstrings for new views or complex logic, and does not break existing tests.
 
-**Roni Ahamed**
-- 🌐 GitHub: [@roniahamed](https://github.com/roniahamed)
-- 📧 Contact via GitHub
-- 🏢 Project: [EduLoop](https://github.com/roniahamed/EduLoop)
+## License
 
-### Project Stats
-- **Version:** 1.0.0
-- **Release:** October 9, 2025
-- **Status:** Production-Ready
-- **Performance:** A+ Grade
-- **Security:** 100% Score
+Copyright (c) 2025 Roni Ahamed (JVAI). All rights reserved.
 
-### Built With
-- Django, Django REST Framework, PostgreSQL
-- Docker, Gunicorn, Nginx
-- Django Unfold (Modern Admin)
+This project is licensed under a **Custom Proprietary License**. The following terms apply:
 
----
+- You are permitted to view and reference the source code for educational and evaluation purposes only.
+- Commercial use, redistribution, modification, or deployment of this software, in whole or in part, is strictly prohibited without prior written permission from the copyright holder.
+- Unauthorized copying, sublicensing, or resale of this software or its derivatives is not allowed.
 
-## 📄 License
+See the [LICENSE](./LICENSE) file in the repository root for the full license text.
 
-**Proprietary Software - All Rights Reserved**
+For licensing inquiries or permissions, contact [mdroniahamed56@gmail.com](mailto:mdroniahamed56@gmail.com).
 
-Copyright © 2025 Roni Ahamed
+## Contact
 
-This software is proprietary and confidential. No part may be reproduced, distributed, or transmitted without prior written permission.
+- **GitHub**: [@roniahamed](https://github.com/roniahamed)
+- **Portfolio**: [roniahamed.com](https://www.roniahamed.com)
+- **LinkedIn**: [Roni Ahamed](https://www.linkedin.com/in/roniahamed/)
+- **Email**: [mdroniahamed56@gmail.com](mailto:mdroniahamed56@gmail.com)
 
-**For licensing inquiries:**
-- Repository: [github.com/roniahamed/EduLoop](https://github.com/roniahamed/EduLoop)
-- Issues: [GitHub Issues](https://github.com/roniahamed/EduLoop/issues)
-
----
-
-<div align="center">
-
-## 🌟 EduLoop - Production-Ready Educational API
-
-**Built with ❤️ by Roni Ahamed**
-
-[![Performance](https://img.shields.io/badge/⚡-12.3ms-green.svg)](./COMPREHENSIVE_API_ANALYSIS_REPORT.md)
-[![Security](https://img.shields.io/badge/🛡️-100%25-brightgreen.svg)](./COMPREHENSIVE_API_ANALYSIS_REPORT.md)
-[![Docs](https://img.shields.io/badge/📚-95%25-blue.svg)](./Documentations/)
-
-[📚 Documentation](./Documentations/) • [🚀 Get Started](#-quick-start) • [📊 Performance](./COMPREHENSIVE_API_ANALYSIS_REPORT.md)
-
-*Enterprise-grade • High-performance • Developer-friendly*
-
-</div>
+If you find this project useful, please consider starring the repository on GitHub.
