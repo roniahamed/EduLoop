@@ -1,8 +1,11 @@
 # EduLoop — Intelligent Quiz & Question Bank Platform
 
 EduLoop is a powerful, easy-to-use backend API that helps educational institutions, coaching centers, and content creators build and deliver smart, structured, and personalized quizzes at scale.
+
 It organizes your entire question bank with a clean hierarchical system — Groups → Subjects → Categories → Subcategories — making content management intuitive and scalable. Students enjoy a smooth, session-based quiz experience with smart question rotation, seen-question tracking, and flexible support for all major question types (MCQ, True/False, Fill-in-the-Blank, Math, Writing, and more).
+
 Whether you're running daily practice tests, mock exams, or adaptive learning sessions, EduLoop simplifies question bank management, enables bulk uploads with error reporting, and provides secure, token-based access for students — all while giving admins full control and insightful dashboard statistics.
+
 Built for performance and reliability, EduLoop helps you focus on creating great educational content while delivering a seamless and engaging quiz experience to your learners.
 
 ## Live Demo
